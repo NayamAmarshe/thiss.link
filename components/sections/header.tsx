@@ -1,10 +1,16 @@
 import { popInAnimation } from "@/lib/motion";
-import LinkForm from "../form";
+import LinkForm from "../link-form";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { LinkDocument } from "@/types/documents";
+import UnlockForm from "../unlock-form";
 
-export default function Header() {
+export default function Header({
+  linkData,
+}: {
+  linkData?: LinkDocument | null;
+}) {
   const [creatingLink, setCreatingLink] = useState(false);
 
   return (
@@ -45,10 +51,18 @@ export default function Header() {
           </motion.span>
         </motion.div>
 
-        <LinkForm
-          creatingLink={creatingLink}
-          setCreatingLink={setCreatingLink}
-        />
+        {linkData ? (
+          <UnlockForm
+            linkData={linkData}
+            checkingLink={creatingLink}
+            setCheckingLink={setCreatingLink}
+          />
+        ) : (
+          <LinkForm
+            creatingLink={creatingLink}
+            setCreatingLink={setCreatingLink}
+          />
+        )}
       </motion.div>
     </motion.header>
   );

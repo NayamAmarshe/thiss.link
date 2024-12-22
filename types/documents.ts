@@ -27,9 +27,9 @@ export type UserLinksDocument = {
 export type LinkDocument = {
   link: string;
   slug: string;
-  createdAt: string;
+  createdAt: Timestamp;
   userId?: string;
   ip?: string;
   isProtected?: boolean;
-  expiresAt?: Date | null;
+  expiresAt?: Timestamp | null;
 };

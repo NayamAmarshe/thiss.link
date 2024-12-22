@@ -1,3 +1,4 @@
+import { LinkDocument } from "@/types/documents";
 import { atomWithStorage } from "jotai/utils";
 
 export type LinkExpiry =
@@ -14,4 +15,9 @@ export const linkExpiryAtom = atomWithStorage<LinkExpiry>(
 export const downloadQrCodeAtom = atomWithStorage<boolean>(
   "download_qr_code",
   false,
+);
+
+export const generatedLinksAtom = atomWithStorage<LinkDocument[]>(
+  "generated_links",
+  [],
 );

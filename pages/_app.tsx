@@ -8,8 +8,6 @@ import { BASE_URL } from "@/lib/config";
 import { Toaster } from "@/components/ui/toaster";
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
-// Remove the emulator connection code
-
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
     if (

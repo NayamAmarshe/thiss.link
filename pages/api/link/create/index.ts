@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { googleSafeBrowsingCheck } from "./safe-browsing";
-import { encryptUrl } from "./encrypt-url";
-import { doc, setDoc } from "firebase/firestore";
+import { encryptUrl } from "../../../../lib/encrypt-url";
+import { doc, setDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Monkey from "monkey-typewriter";
 import { LinkDocument } from "@/types/documents";
@@ -19,8 +19,7 @@ export interface CreateLinkRequest extends NextApiRequest {
 export type CreateLinkResponse = {
   status: string;
   message: string;
-  generatedLink?: string;
-  slug?: string;
+  linkData?: LinkDocument;
 };
 
 export default async function handler(
@@ -34,12 +33,6 @@ export default async function handler(
   if (!userId) {
     expiry = undefined;
   }
-
-  console.log("🚀 => userId:", userId);
-  console.log("🚀 => url:", url);
-  console.log("🚀 => password:", password);
-  console.log("🚀 => slug:", slug);
-  console.log("🚀 => expiry:", expiry);
 
   if (!url) {
     return res.status(400).json({
@@ -115,8 +108,8 @@ export default async function handler(
       ...(!userId && {
         ip,
       }),
-      createdAt: new Date().toISOString(),
-      expiresAt,
+      createdAt: Timestamp.fromDate(new Date()),
+      expiresAt: expiresAt ? Timestamp.fromDate(expiresAt) : null,
     };
 
     const setDocPromises = [setDoc(doc(db, `new-links/${slug}`), linkData)];
@@ -124,7 +117,7 @@ export default async function handler(
     if (userId) {
       setDocPromises.push(
         setDoc(doc(db, `users/${userId}/links/${slug}`), {
-          createdAt: new Date().toISOString(),
+          createdAt: new Date(),
           ...(!userId && {
             expiresAt,
           }),
@@ -138,8 +131,17 @@ export default async function handler(
     return res.status(200).json({
       status: "success",
       message: "Link created successfully",
-      generatedLink: `https://thiss.link/${slug}`,
-      slug: slug,
+      linkData: {
+        createdAt: Timestamp.fromDate(new Date()),
+        link:
+          process.env.NODE_ENV === "development"
+            ? `http://localhost:3000/${slug}`
+            : `https://thiss.link/${slug}`,
+        slug: slug,
+        expiresAt: expiresAt ? Timestamp.fromDate(expiresAt) : null,
+        isProtected,
+        userId,
+      },
     });
   } catch (error) {
     console.error(error);

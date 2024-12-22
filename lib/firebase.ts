@@ -21,8 +21,14 @@ const db = getFirestore(firebaseApp);
 // Add emulator connection before initialization
 if (process.env.NODE_ENV === "development") {
   try {
-    connectFirestoreEmulator(db, "localhost", 8080);
-    connectAuthEmulator(auth, "http://localhost:9099");
+    // Check if we're not already connected to the emulator
+    const useEmulator = process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR;
+
+    if (useEmulator && !global.firestoreEmulatorInitialized) {
+      connectFirestoreEmulator(db, "localhost", 8080);
+      connectAuthEmulator(auth, "http://localhost:9099");
+      global.firestoreEmulatorInitialized = true;
+    }
   } catch (error) {
     console.error("Error connecting to emulators:", error);
   }

@@ -11,6 +11,10 @@
   @apply transition-none;
 }
 
+.firebase-emulator-warning {
+  @apply opacity-0 hover:opacity-20;
+}
+
 @layer base {
   * {
     @apply border-border;

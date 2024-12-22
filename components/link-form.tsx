@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FaHandPointRight, FaLock, FaSpinner, FaUnlock } from "react-icons/fa";
+import { FaLock, FaSpinner, FaUnlock } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "motion/react";
 import { popInAnimation } from "@/lib/motion";
@@ -10,12 +10,13 @@ import type {
   CreateLinkRequest,
   CreateLinkResponse,
 } from "../pages/api/link/create/index";
-import { auth } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
 import LinkOptionsDialog from "./header/link-options";
-import { useAtomValue } from "jotai";
-import { linkExpiryAtom } from "./atoms/user-settings";
+import { useAtom, useAtomValue } from "jotai";
+import { generatedLinksAtom, linkExpiryAtom } from "./atoms/user-settings";
 import useUser from "./hooks/use-user";
+import { LinkDocument } from "@/types/documents";
+import GeneratedLinkCard from "./header/generated-link-card";
 
 const LinkForm = ({
   creatingLink,
@@ -24,26 +25,21 @@ const LinkForm = ({
   creatingLink: boolean;
   setCreatingLink: (value: boolean) => void;
 }) => {
+  const { user } = useUser();
+
   const [url, setUrl] = useState("");
   const [slug, setSlug] = useState("");
   const { toast } = useToast();
   const [password, setPassword] = useState("");
   const [isLocked, setIsLocked] = useState(false);
   const linkExpiry = useAtomValue(linkExpiryAtom);
-
-  // Get firebase userId
-  const [userId, setUserId] = useState("");
-  const { user } = useUser();
-
-  useEffect(() => {
-    if (auth.currentUser) {
-      setUserId(auth.currentUser.uid);
-    }
-  }, []);
+  const [generatedLinks, setGeneratedLinks] = useAtom(generatedLinksAtom);
+  const [generatedLink, setGeneratedLink] = useState<LinkDocument | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setCreatingLink(true);
+
     const urlRegex = /^(https?:\/\/|ftp:\/\/|magnet:\?).+/i;
     if (!urlRegex.test(url)) {
       toast({
@@ -54,8 +50,7 @@ const LinkForm = ({
       });
       return;
     }
-    // Add artificial delay
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     try {
       const response = await fetch("/api/link/create", {
         method: "POST",
@@ -71,15 +66,19 @@ const LinkForm = ({
         } as CreateLinkRequest["body"]),
       });
       const responseData: CreateLinkResponse = await response.json();
-
-      toast({
-        title: "Success",
-        description: "Link has been created",
-        action: <ToastAction altText="Got it">Got it</ToastAction>,
-      });
       console.log("🚀 => responseData:", responseData);
-      if (responseData.status === "error") {
+      if (responseData.status === "error" || !response.ok) {
         throw new Error(responseData.message);
+      }
+
+      if (responseData.linkData) {
+        toast({
+          title: "Success",
+          description: "thiss link has been copied to clipboard",
+          action: <ToastAction altText="Got it">Got it</ToastAction>,
+        });
+        setGeneratedLinks((prev) => [...prev, responseData.linkData!]);
+        setGeneratedLink(responseData.linkData);
       }
     } catch (error) {
       toast({
@@ -155,12 +154,8 @@ const LinkForm = ({
             size="lg"
             disabled={creatingLink}
           >
-            {creatingLink ? (
-              <FaSpinner className="mr-2 animate-spin" />
-            ) : (
-              <FaHandPointRight className="mr-2" />
-            )}{" "}
-            {!creatingLink ? "squish thiss link" : "squishing"}
+            {creatingLink ? <FaSpinner className="mr-2 animate-spin" /> : null}{" "}
+            {!creatingLink ? "(ツ) squish thiss link" : "squishing"}
           </Button>
 
           <LinkOptionsDialog slug={slug} setSlug={setSlug} />
@@ -175,6 +170,8 @@ const LinkForm = ({
             {isLocked ? <FaLock /> : <FaUnlock />}
           </Button>
         </motion.div>
+
+        <GeneratedLinkCard generatedLink={generatedLink} />
       </motion.div>
     </form>
   );
