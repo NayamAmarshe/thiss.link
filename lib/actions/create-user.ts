@@ -1,9 +1,9 @@
+"use server";
+
 import { db } from "@/lib/firebase";
 import { UserDocument } from "@/types/documents";
 import { User } from "firebase/auth";
 import { collection, doc, getDoc, setDoc } from "firebase/firestore";
-
-export const runtime = "edge";
 
 export interface CreateUserRequest {
   user?: User;

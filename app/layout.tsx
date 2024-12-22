@@ -1,6 +1,9 @@
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
 import { Providers } from "@/components/providers";
+import { connectFirestoreEmulator } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
+import { connectAuthEmulator } from "firebase/auth";
 
 export const metadata = {
   title: "MagLit🔥 - Privacy Respecting Encrypted Link Shortener",
@@ -33,6 +36,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Add emulator connection before initialization
+  connectFirestoreEmulator(db, "localhost", 8080);
+  connectAuthEmulator(auth, "http://localhost:9099");
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
