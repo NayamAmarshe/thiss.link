@@ -2,32 +2,26 @@ import { db } from "@/lib/firebase";
 import { UserDocument } from "@/types/documents";
 import { User } from "firebase/auth";
 import { collection, doc, getDoc, setDoc } from "firebase/firestore";
-import { NextApiRequest, NextApiResponse } from "next";
 
 export const runtime = "edge";
 
-export interface CreateUserRequest extends NextApiRequest {
-  body: {
-    user?: User;
-  };
+export interface CreateUserRequest {
+  user?: User;
 }
 export type CreateUserResponse = {
   status: "success" | "error";
   message: string;
 };
 
-export default async function handler(
-  req: CreateUserRequest,
-  res: NextApiResponse<CreateUserResponse>,
-) {
-  const { user } = req.body;
-
+export async function createUser({
+  user,
+}: CreateUserRequest): Promise<CreateUserResponse> {
   if (!user?.uid) {
     console.error("No user found");
-    return res.status(400).json({
+    return {
       status: "error",
       message: "Missing required fields",
-    });
+    };
   }
 
   try {
@@ -37,10 +31,10 @@ export default async function handler(
     const userDocSnapshot = await getDoc(userDoc);
     if (userDocSnapshot.exists()) {
       console.log("User already exists");
-      return res.status(200).json({
+      return {
         status: "success",
         message: "User already exists",
-      });
+      };
     }
     await setDoc(userDoc, {
       createdAt: new Date().toISOString(),
@@ -52,14 +46,14 @@ export default async function handler(
     console.log("User created successfully");
   } catch (error) {
     console.error("Error creating user:", error);
-    return res.status(500).json({
+    return {
       status: "error",
       message: "Error creating user",
-    });
+    };
   }
 
-  return res.status(200).json({
+  return {
     status: "success",
     message: "User created successfully",
-  });
+  };
 }

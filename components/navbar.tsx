@@ -8,27 +8,7 @@ import { Button } from "./ui/button";
 import useUser from "./hooks/use-user";
 
 const Navbar = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const { isLoggedIn, user } = useUser();
-
-  const handleLogin = async () => {
-    setIsLoading(true);
-    try {
-      const provider = new GoogleAuthProvider();
-      const signInData = await signInWithPopup(auth, provider);
-      await fetch("/api/user/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ user: signInData.user }),
-      });
-    } catch (error) {
-      console.error("Error signing in:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { isLoggedIn, user, handleLogin, userLoading } = useUser();
 
   const handleLogout = async () => {
     try {
@@ -70,10 +50,10 @@ const Navbar = () => {
           ) : (
             <Button
               onClick={handleLogin}
-              disabled={isLoading}
+              disabled={userLoading}
               className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 transition-colors disabled:opacity-50"
             >
-              {isLoading ? "Signing in..." : "Sign In"}
+              {userLoading ? "Signing in..." : "Sign In"}
             </Button>
           )}
         </div>

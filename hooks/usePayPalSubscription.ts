@@ -9,6 +9,7 @@ import {
   PayPalButtonCreateSubscription,
   PayPalButtonOnApprove,
 } from "@paypal/paypal-js";
+import { verifySubscription } from "@/lib/actions/verify-subscription";
 
 export const usePayPalSubscription = (planId: string) => {
   const [{ isResolved, isPending }, paypalDispatch] = usePayPalScriptReducer();
@@ -67,16 +68,19 @@ export const usePayPalSubscription = (planId: string) => {
     }
 
     try {
-      await fetch("/api/user/verify-subscription", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          subscriptionId: data.subscriptionID,
-          userId: user.uid,
-        }),
+      const response = await verifySubscription({
+        subscriptionId: data.subscriptionID,
+        userId: user.uid,
       });
+
+      if (response.status === "error") {
+        toast({
+          title: "Error",
+          description: response.message,
+          variant: "destructive",
+        });
+        return;
+      }
 
       toast({
         title: "Success",

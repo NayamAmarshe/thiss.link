@@ -8,6 +8,7 @@ import {
 } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { UserDocument } from "@/types/documents";
+import { createUser } from "@/lib/actions/create-user";
 
 /**
  * Custom hook for managing user data and tasks.
@@ -25,13 +26,12 @@ const useUser = () => {
     try {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
-      await fetch("/api/user/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ user: userCredential.user }),
+      const createUserResponse = await createUser({
+        user: userCredential.user,
       });
+      if (createUserResponse.status === "error") {
+        throw new Error(createUserResponse.message);
+      }
     } catch (error) {
       console.error("Error signing in:", error);
     } finally {

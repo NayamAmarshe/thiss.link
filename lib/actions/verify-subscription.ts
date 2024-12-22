@@ -2,36 +2,29 @@ import { db } from "@/lib/firebase";
 import { UserDocument } from "@/types/documents";
 import { doc, Timestamp, updateDoc } from "firebase/firestore";
 import { NextApiRequest, NextApiResponse } from "next";
-import { generateAccessToken } from "../../../lib/generate-acces-token";
+import { generateAccessToken } from "../generate-acces-token";
 
 const base = process.env.PAYPAL_BASE_URL;
 
 export const runtime = "edge";
 
-export interface VerifySubscriptionRequest extends NextApiRequest {
-  body: {
-    subscriptionId: string;
-    userId: string;
-  };
+export interface VerifySubscriptionRequest {
+  subscriptionId: string;
+  userId: string;
 }
 
 export type VerifySubscriptionResponse = {
-  success: boolean;
+  status: "success" | "error";
+  message: string;
 };
 
-export default async function handler(
-  req: VerifySubscriptionRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
+export async function verifySubscription({
+  subscriptionId,
+  userId,
+}: VerifySubscriptionRequest): Promise<VerifySubscriptionResponse> {
   try {
-    const { subscriptionId, userId } = req.body;
-
     if (!subscriptionId || !userId) {
-      return res.status(400).json({ error: "Missing required parameters" });
+      return { status: "error", message: "Missing required parameters" };
     }
 
     const token = await generateAccessToken();
@@ -69,9 +62,9 @@ export default async function handler(
     };
     await updateDoc(userRef, userData);
 
-    return res.status(200).json({ success: true });
+    return { status: "success", message: "Subscription verified" };
   } catch (error) {
     console.error("Error verifying subscription:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    return { status: "error", message: "Internal server error" };
   }
 }
