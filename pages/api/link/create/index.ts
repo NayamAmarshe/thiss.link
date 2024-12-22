@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { googleSafeBrowsingCheck } from "./safe-browsing";
 import { encryptUrl } from "../../../../lib/encrypt-url";
-import { doc, setDoc, Timestamp } from "firebase/firestore";
+import { doc, setDoc, getDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Monkey from "monkey-typewriter";
 import { LinkDocument } from "@/types/documents";
@@ -49,6 +49,23 @@ export default async function handler(
     });
   }
 
+  // Validate slug if provided
+  if (slug) {
+    const slugRegex = /^[a-zA-Z0-9_-]+$/;
+    if (slug.length < 3 || slug.length > 50) {
+      return res.status(400).json({
+        status: "error",
+        message: "Slug must be between 3 and 50 characters",
+      });
+    }
+    if (!slugRegex.test(slug)) {
+      return res.status(400).json({
+        status: "error",
+        message: "Slug can only contain letters, numbers, dash and underscore",
+      });
+    }
+  }
+
   // GOOGLE SAFE BROWSING CHECK
   try {
     await googleSafeBrowsingCheck(url);
@@ -87,6 +104,16 @@ export default async function handler(
     if ((slug && !userId) || !slug) {
       slug = Monkey.word();
     }
+
+    // Check if slug is already in use
+    const slugDoc = await getDoc(doc(db, `new-links/${slug}`));
+    if (slugDoc.exists()) {
+      return res.status(400).json({
+        status: "error",
+        message: "This slug is already in use. Please try another one.",
+      });
+    }
+
     const isProtected = !!password;
     let encryptedUrl = url;
     if (password) {

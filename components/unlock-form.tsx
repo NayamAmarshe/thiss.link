@@ -6,8 +6,6 @@ import { motion, AnimatePresence } from "motion/react";
 import { popInAnimation } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { LinkDocument } from "@/types/documents";
-import GeneratedLinkCard from "./header/generated-link-card";
-import { UnlockIcon } from "lucide-react";
 import { decryptUrl } from "@/lib/decrypt-url";
 import { useRouter } from "next/router";
 import { toast } from "@/hooks/use-toast";

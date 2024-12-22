@@ -27,6 +27,9 @@ import {
   linkExpiryAtom,
 } from "../atoms/user-settings";
 import useUser from "../hooks/use-user";
+import { useEffect, useState } from "react";
+import { toast } from "@/hooks/use-toast";
+import { ToastAction } from "../ui/toast";
 
 const LinkOptionsDialog = ({
   slug,
@@ -37,8 +40,23 @@ const LinkOptionsDialog = ({
 }) => {
   const [linkExpiry, setLinkExpiry] = useAtom(linkExpiryAtom);
   const [downloadQrCode, setDownloadQrCode] = useAtom(downloadQrCodeAtom);
+  const [error, setError] = useState<string | null>(null);
 
   const { isLoggedIn } = useUser();
+
+  useEffect(() => {
+    if (!slug) {
+      setError(null);
+      return;
+    }
+    const slugRegex = /^[a-zA-Z0-9_-]+$/;
+    if (slug.length < 3 || slug.length > 50) {
+      setError("Slug must be between 3 and 50 characters");
+    }
+    if (!slugRegex.test(slug)) {
+      setError("Slug can only contain letters, numbers, dash and underscore");
+    }
+  }, [slug]);
 
   return (
     <Dialog>
@@ -124,7 +142,19 @@ const LinkOptionsDialog = ({
         </div>
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="submit">
+            <Button
+              type={error ? "button" : "submit"}
+              onClick={(e) => {
+                if (error) {
+                  toast({
+                    title: "Error",
+                    description: error,
+                    action: <ToastAction altText="Got it">Got it</ToastAction>,
+                  });
+                  e.preventDefault();
+                }
+              }}
+            >
               <FaSave className="mr-2 h-4 w-4" />
               Save changes
             </Button>

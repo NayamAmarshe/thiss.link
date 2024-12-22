@@ -26,10 +26,11 @@ export default function Pricing() {
             perks={[
               "Unlimited links",
               "Unlimited custom links",
-              "No expiration",
-              "Encryption",
+              "Custom link expiration",
+              "Never expiring links",
+              "Full encryption",
               "Password protection",
-              "Analytics",
+              "Analytics (Coming Soon)",
             ]}
             planId={process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID || ""}
           />

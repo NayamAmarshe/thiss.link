@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { LinkDocument } from "@/types/documents";
 
@@ -31,7 +31,7 @@ export default async function handler(
     const linkRef = doc(db, "new-links", slug);
     const linkDoc = await getDoc(linkRef);
     if (!linkDoc.exists()) {
-      return res.status(400).json({
+      return res.status(404).json({
         status: "error",
         message: "Link not found",
       });
@@ -39,11 +39,25 @@ export default async function handler(
 
     const linkData = linkDoc.data() as LinkDocument;
 
+    // Check if link is expired
+    if (linkData.expiresAt) {
+      const now = new Date();
+      const expiryDate = linkData.expiresAt.toDate();
+
+      if (expiryDate <= now) {
+        // Delete expired link
+        await deleteDoc(linkRef);
+        return res.status(404).json({
+          status: "error",
+          message: "Link has expired and been deleted",
+        });
+      }
+    }
+
     // Calculate cache duration based on expiry
     if (linkData.expiresAt) {
       const now = new Date();
       const expiryDate = linkData.expiresAt.toDate();
-      console.log("🚀 => expiryDate:", expiryDate);
 
       if (expiryDate > now) {
         // Calculate seconds until expiry
