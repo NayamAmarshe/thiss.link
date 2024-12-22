@@ -41,7 +41,7 @@ const SlugPage = () => {
       router.push("/");
       toast({
         title: "Error",
-        description: error.message,
+        description: "Error fetching link",
         action: <ToastAction altText="Got it">Got it</ToastAction>,
       });
     }

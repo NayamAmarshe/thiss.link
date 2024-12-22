@@ -83,7 +83,7 @@ const LinkForm = ({
     } catch (error) {
       toast({
         title: "Error",
-        description: error.message,
+        description: "Error creating link",
         action: <ToastAction altText="Got it">Got it</ToastAction>,
       });
     } finally {
