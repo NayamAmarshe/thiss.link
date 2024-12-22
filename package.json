@@ -50,6 +50,7 @@
     "@cloudflare/next-on-pages": "^1.13.7",
     "@types/react": "18.3.3",
     "autoprefixer": "^10.4.20",
+    "eslint-plugin-next-on-pages": "^1.13.7",
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
     "prettier-plugin-sort-imports": "^1.8.6",
