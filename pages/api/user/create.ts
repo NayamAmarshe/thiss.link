@@ -4,6 +4,8 @@ import { User } from "firebase/auth";
 import { collection, doc, getDoc, setDoc } from "firebase/firestore";
 import { NextApiRequest, NextApiResponse } from "next";
 
+export const runtime = "edge";
+
 export interface CreateUserRequest extends NextApiRequest {
   body: {
     user?: User;

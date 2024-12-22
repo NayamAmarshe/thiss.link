@@ -1,11 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { googleSafeBrowsingCheck } from "./safe-browsing";
+import { googleSafeBrowsingCheck } from "../../../../lib/safe-browsing";
 import { encryptUrl } from "../../../../lib/encrypt-url";
 import { doc, setDoc, getDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Monkey from "monkey-typewriter";
 import { LinkDocument } from "@/types/documents";
 import type { LinkExpiry } from "@/components/atoms/user-settings";
+
+export const runtime = "edge";
 
 export interface CreateLinkRequest extends NextApiRequest {
   body: {

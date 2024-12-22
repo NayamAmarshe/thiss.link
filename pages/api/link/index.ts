@@ -3,6 +3,8 @@ import { doc, getDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { LinkDocument } from "@/types/documents";
 
+export const runtime = "edge";
+
 export interface GetLinkRequest extends NextApiRequest {
   body: {
     slug: string;

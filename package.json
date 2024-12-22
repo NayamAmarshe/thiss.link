@@ -9,7 +9,10 @@
     "docker:build": "docker-compose build",
     "docker": "docker-compose up",
     "docker:d": "docker-compose up -d",
-    "stop": "pkill java firebase; for port in 4000 4001 4002 9150; do lsof -t -i:$port | xargs -r kill; done"
+    "stop": "pkill java firebase; for port in 4000 4001 4002 9150; do lsof -t -i:$port | xargs -r kill; done",
+    "pages:build": "npx @cloudflare/next-on-pages",
+    "preview": "npm run pages:build && wrangler pages dev",
+    "deploy": "npm run pages:build && wrangler pages deploy"
   },
   "dependencies": {
     "@paypal/paypal-js": "^8.1.2",
@@ -44,6 +47,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.7",
     "@types/react": "18.3.3",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",

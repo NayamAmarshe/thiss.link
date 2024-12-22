@@ -2,9 +2,11 @@ import { db } from "@/lib/firebase";
 import { UserDocument } from "@/types/documents";
 import { doc, Timestamp, updateDoc } from "firebase/firestore";
 import { NextApiRequest, NextApiResponse } from "next";
-import { generateAccessToken } from "./generate-acces-token";
+import { generateAccessToken } from "../../../lib/generate-acces-token";
 
 const base = process.env.PAYPAL_BASE_URL;
+
+export const runtime = "edge";
 
 export interface VerifySubscriptionRequest extends NextApiRequest {
   body: {
