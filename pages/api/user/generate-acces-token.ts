@@ -1,8 +1,6 @@
-const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
-console.log("🚀 => PAYPAL_CLIENT_ID:", PAYPAL_CLIENT_ID);
+const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
 const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
-console.log("🚀 => PAYPAL_CLIENT_SECRET:", PAYPAL_CLIENT_SECRET);
 
 const base = process.env.PAYPAL_BASE_URL;
 
@@ -18,7 +16,6 @@ export const generateAccessToken = async () => {
     const auth = Buffer.from(
       `${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`,
     ).toString("base64");
-    console.log("🚀 => auth:", auth);
 
     const response = await fetch(`${base}/v1/oauth2/token`, {
       method: "POST",
