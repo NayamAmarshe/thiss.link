@@ -1,70 +1,66 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { googleSafeBrowsingCheck } from "../../../../lib/safe-browsing";
-import { encryptUrl } from "../../../../lib/encrypt-url";
-import { doc, setDoc, getDoc, Timestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import Monkey from "monkey-typewriter";
-import { LinkDocument } from "@/types/documents";
+"use server";
+
 import type { LinkExpiry } from "@/components/atoms/user-settings";
+import { LinkDocument } from "@/types/documents";
+import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
+import { db } from "../firebase";
+import { encryptUrl } from "../encrypt-url";
+import Monkey from "monkey-typewriter";
+import { googleSafeBrowsingCheck } from "../safe-browsing";
 
-export const runtime = "edge";
+export type CreateLinkRequest = {
+  slug: string;
+  url: string;
+  password: string;
+  userId?: string;
+  expiry?: LinkExpiry | "never";
+};
 
-export interface CreateLinkRequest extends NextApiRequest {
-  body: {
-    slug: string;
-    url: string;
-    password: string;
-    userId?: string;
-    expiry?: LinkExpiry | "never";
-  };
-}
 export type CreateLinkResponse = {
   status: string;
   message: string;
   linkData?: LinkDocument;
 };
 
-export default async function handler(
-  req: CreateLinkRequest,
-  res: NextApiResponse<CreateLinkResponse>,
-) {
-  const { url, password, userId } = req.body;
-
-  let slug = req.body.slug || "";
-  let expiry = req.body.expiry;
+export async function createLink({
+  url,
+  password,
+  userId,
+  slug: providedSlug,
+  expiry: providedExpiry,
+}: CreateLinkRequest): Promise<CreateLinkResponse> {
+  let slug = providedSlug || "";
+  let expiry = providedExpiry;
   if (!userId) {
     expiry = undefined;
   }
 
   if (!url) {
-    return res.status(400).json({
+    return {
       status: "error",
       message: "Missing required fields",
-    });
+    };
   }
 
   const urlRegex = /^(https?:\/\/|ftp:\/\/|magnet:\?).+/i;
   if (!urlRegex.test(url)) {
-    return res.status(400).json({
-      status: "error",
-      message: "Invalid URL",
-    });
+    return { status: "error", message: "Invalid URL" };
   }
 
   // Validate slug if provided
   if (slug) {
     const slugRegex = /^[a-zA-Z0-9_-]+$/;
     if (slug.length < 3 || slug.length > 50) {
-      return res.status(400).json({
+      return {
         status: "error",
         message: "Slug must be between 3 and 50 characters",
-      });
+      };
     }
     if (!slugRegex.test(slug)) {
-      return res.status(400).json({
+      return {
         status: "error",
         message: "Slug can only contain letters, numbers, dash and underscore",
-      });
+      };
     }
   }
 
@@ -72,10 +68,10 @@ export default async function handler(
   try {
     await googleSafeBrowsingCheck(url);
   } catch (error) {
-    return res.status(401).json({
+    return {
       status: "error",
       message: error.message,
-    });
+    };
   }
 
   let expiresAt: Date | null = null;
@@ -110,12 +106,11 @@ export default async function handler(
     // Check if slug is already in use
     const slugDoc = await getDoc(doc(db, `new-links/${slug}`));
     if (slugDoc.exists()) {
-      return res.status(400).json({
+      return {
         status: "error",
         message: "This slug is already in use. Please try another one.",
-      });
+      };
     }
-
     const isProtected = !!password;
     let encryptedUrl = url;
     if (password) {
@@ -123,20 +118,11 @@ export default async function handler(
       encryptedUrl = btoa(String.fromCharCode(...encryptUrlResponse));
     }
 
-    const forwarded = req.headers["x-forwarded-for"];
-    // Store IP Address of potential scammers
-    const ip = forwarded
-      ? (forwarded as string).split(/, /)[0]
-      : req.socket.remoteAddress;
-
     const linkData: LinkDocument = {
       link: isProtected ? encryptedUrl : url,
       slug: slug,
       isProtected: isProtected,
       ...(userId && { userId }),
-      ...(!userId && {
-        ip,
-      }),
       createdAt: Timestamp.fromDate(new Date()),
       expiresAt: expiresAt ? Timestamp.fromDate(expiresAt) : null,
     };
@@ -157,26 +143,26 @@ export default async function handler(
 
     await Promise.all(setDocPromises);
 
-    return res.status(200).json({
+    return {
       status: "success",
       message: "Link created successfully",
       linkData: {
-        createdAt: Timestamp.fromDate(new Date()),
+        createdAt: new Date().getTime(),
         link:
           process.env.NODE_ENV === "development"
             ? `http://localhost:3000/${slug}`
             : `https://thiss.link/${slug}`,
         slug: slug,
-        expiresAt: expiresAt ? Timestamp.fromDate(expiresAt) : null,
+        expiresAt: expiresAt ? expiresAt.getTime() : null,
         isProtected,
         userId,
       },
-    });
+    };
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
+    return {
       status: "error",
       message: "Something went wrong, please try again",
-    });
+    };
   }
 }

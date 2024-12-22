@@ -6,10 +6,6 @@ import { motion, AnimatePresence } from "motion/react";
 import { popInAnimation } from "@/lib/motion";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "./ui/toast";
-import type {
-  CreateLinkRequest,
-  CreateLinkResponse,
-} from "../pages/api/link/create/index";
 import { cn } from "@/lib/utils";
 import LinkOptionsDialog from "./header/link-options";
 import { useAtom, useAtomValue } from "jotai";
@@ -17,6 +13,7 @@ import { generatedLinksAtom, linkExpiryAtom } from "./atoms/user-settings";
 import useUser from "./hooks/use-user";
 import { LinkDocument } from "@/types/documents";
 import GeneratedLinkCard from "./header/generated-link-card";
+import { createLink } from "@/lib/actions/create-link";
 
 const LinkForm = ({
   creatingLink,
@@ -52,22 +49,14 @@ const LinkForm = ({
     }
 
     try {
-      const response = await fetch("/api/link/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          url,
-          password,
-          userId: user?.uid,
-          slug: slug,
-          expiry: linkExpiry,
-        } as CreateLinkRequest["body"]),
+      const responseData = await createLink({
+        url,
+        password,
+        userId: user?.uid,
+        slug: slug,
+        expiry: linkExpiry,
       });
-      const responseData: CreateLinkResponse = await response.json();
-      console.log("🚀 => responseData:", responseData);
-      if (responseData.status === "error" || !response.ok) {
+      if (responseData.status === "error") {
         throw new Error(responseData.message);
       }
 

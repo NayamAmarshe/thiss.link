@@ -1,3 +1,5 @@
+"use client";
+
 import { popInAnimation } from "@/lib/motion";
 import LinkForm from "../link-form";
 import { motion } from "motion/react";

@@ -1,4 +1,5 @@
-import Head from "next/head";
+"use client";
+
 import Header from "@/components/sections/header";
 import Features from "@/components/sections/features";
 import Community from "@/components/sections/community";
@@ -10,11 +11,6 @@ import Navbar from "@/components/navbar";
 const HomePage = () => {
   return (
     <>
-      <Head>
-        <title>thiss.link - Link Shortener</title>
-        <meta name="description" content="Simple and fast URL shortener" />
-      </Head>
-
       <Navbar />
 
       <main className="max-w-screen relative z-0 flex h-full min-h-screen w-full snap-both snap-proximity flex-col overflow-y-scroll pt-16">

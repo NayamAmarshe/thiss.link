@@ -1,6 +1,6 @@
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { GetLinkRequest, GetLinkResponse } from "./api/link";
+"use client";
+
+import { useEffect, useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import Head from "next/head";
@@ -8,25 +8,21 @@ import Navbar from "@/components/navbar";
 import Header from "@/components/sections/header";
 import Footer from "@/components/footer";
 import { LinkDocument } from "@/types/documents";
+import { useRouter, useSearchParams } from "next/navigation";
+import { getLink } from "@/lib/actions/get-link";
 
-const SlugPage = () => {
+const SlugPage = ({ params }: { params: { slug: string } }) => {
   const router = useRouter();
+
   const [linkData, setLinkData] = useState<LinkDocument | null>(null);
 
   const fetchLink = async () => {
+    if (!params.slug) return;
     try {
-      const response = await fetch("/api/link", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          slug: router.query.slug,
-        } as GetLinkRequest["body"]),
-        cache: "no-cache",
+      const responseData = await getLink({
+        slug: params.slug,
       });
-      const responseData: GetLinkResponse = await response.json();
-      if (responseData.status === "error" || !response.ok) {
+      if (responseData.status === "error") {
         throw new Error(responseData.message);
       }
       if (responseData.status === "success" && responseData.linkData) {
@@ -48,11 +44,11 @@ const SlugPage = () => {
   };
 
   useEffect(() => {
-    if (!router.query.slug) return;
+    if (!params.slug) return;
     fetchLink();
-  }, [router.query.slug]);
+  }, [params.slug]);
 
-  if (!router.query.slug || !linkData) {
+  if (!params.slug || !linkData) {
     return null;
   }
 

@@ -7,9 +7,9 @@ import { popInAnimation } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { LinkDocument } from "@/types/documents";
 import { decryptUrl } from "@/lib/decrypt-url";
-import { useRouter } from "next/router";
 import { toast } from "@/hooks/use-toast";
 import { ToastAction } from "./ui/toast";
+import { useRouter } from "next/navigation";
 
 const UnlockForm = ({
   checkingLink,
