@@ -9,7 +9,7 @@ import Marquee from "react-fast-marquee";
 export default function Faq() {
   return (
     <div className="snap-start snap-always">
-      <section className=" bg-bg py-20 font-base dark:bg-darkBg lg:py-[100px]">
+      <section className="bg-bg py-20 font-base dark:bg-darkBg lg:py-[100px]">
         <h2 className="mb-14 px-5 text-center text-2xl font-heading md:text-3xl lg:mb-20 lg:text-4xl">
           Frequently asked questions
         </h2>
@@ -17,7 +17,7 @@ export default function Faq() {
         <div className="mx-auto grid w-[700px] max-w-full px-5">
           <Accordion className="text-base sm:text-lg" type="single" collapsible>
             <AccordionItem className="mb-2" value="item-1">
-              <AccordionTrigger>What's this all about?</AccordionTrigger>
+              <AccordionTrigger>What&apos;s this all about?</AccordionTrigger>
               <AccordionContent>
                 thiss.link is a free and open source an encrypted link
                 shortening service that supports HTTP, HTTPs, FTP, and Torrent
