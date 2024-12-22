@@ -8,8 +8,10 @@ import Navbar from "@/components/navbar";
 import Header from "@/components/sections/header";
 import Footer from "@/components/footer";
 import { LinkDocument } from "@/types/documents";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { getLink } from "@/lib/actions/get-link";
+
+export const runtime = "edge";
 
 const SlugPage = ({ params }: { params: { slug: string } }) => {
   const router = useRouter();
