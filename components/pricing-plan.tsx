@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { usePayPalSubscription } from "@/hooks/usePayPalSubscription";
 import { PayPalButtons } from "@paypal/react-paypal-js";
-import useUser from "./hooks/use-user";
+import useUser from "../hooks/use-user";
 
 export default function PricingPlan({
   perks,

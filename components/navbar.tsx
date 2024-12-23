@@ -3,9 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth } from "@/lib/firebase/firebase";
 import { Button } from "./ui/button";
-import useUser from "./hooks/use-user";
+import useUser from "../hooks/use-user";
 
 const Navbar = () => {
   const { isLoggedIn, user, handleLogin, userLoading } = useUser();

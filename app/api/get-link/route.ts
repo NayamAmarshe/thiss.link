@@ -1,7 +1,6 @@
-"use server";
-
+import { NextResponse } from "next/server";
 import { doc, getDoc, deleteDoc, Timestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase/firebase";
 import { LinkDocument } from "@/types/documents";
 
 export interface GetLinkRequest {
@@ -13,31 +12,37 @@ export type GetLinkResponse = {
   linkData?: LinkDocument;
 };
 
-export async function getLink({
-  slug: providedSlug,
-}: GetLinkRequest): Promise<GetLinkResponse> {
-  let slug = providedSlug || "";
+export async function POST(request: Request) {
+  const body = await request.json();
+  const { slug }: GetLinkRequest = body;
 
   if (!slug) {
-    return {
-      status: "error",
-      message: "Slug is required",
-    };
+    return NextResponse.json<GetLinkResponse>(
+      {
+        status: "error",
+        message: "Slug is required",
+      },
+      { status: 400 },
+    );
   }
 
   try {
     const linkRef = doc(db, "new-links", slug);
     const linkDoc = await getDoc(linkRef);
+
     if (!linkDoc.exists()) {
-      return {
-        status: "error",
-        message: "Link not found",
-      };
+      return NextResponse.json<GetLinkResponse>(
+        {
+          status: "error",
+          message: "Link not found",
+        },
+        { status: 404 },
+      );
     }
 
     const linkData = linkDoc.data() as LinkDocument;
 
-    // Check if link is expired
+    // Check if the link is expired
     if (linkData.expiresAt) {
       const now = new Date();
       const expiryDate = (linkData.expiresAt as Timestamp).toDate();
@@ -45,14 +50,17 @@ export async function getLink({
       if (expiryDate <= now) {
         // Delete expired link
         await deleteDoc(linkRef);
-        return {
-          status: "error",
-          message: "Link has expired and been deleted",
-        };
+        return NextResponse.json<GetLinkResponse>(
+          {
+            status: "error",
+            message: "Link has expired and been deleted",
+          },
+          { status: 410 },
+        );
       }
     }
 
-    return {
+    return NextResponse.json<GetLinkResponse>({
       status: "success",
       message: "Link found",
       linkData: {
@@ -62,12 +70,15 @@ export async function getLink({
           ? (linkData.expiresAt as Timestamp).toDate().getTime()
           : null,
       },
-    };
+    });
   } catch (error) {
     console.error(error);
-    return {
-      status: "error",
-      message: "Something went wrong, please try again",
-    };
+    return NextResponse.json<GetLinkResponse>(
+      {
+        status: "error",
+        message: "Something went wrong, please try again",
+      },
+      { status: 500 },
+    );
   }
 }

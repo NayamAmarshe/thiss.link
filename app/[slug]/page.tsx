@@ -9,8 +9,9 @@ import Header from "@/components/sections/header";
 import Footer from "@/components/footer";
 import { LinkDocument } from "@/types/documents";
 import { useRouter } from "next/navigation";
-import { getLink } from "@/lib/actions/get-link";
+import { GetLinkRequest, GetLinkResponse } from "../api/get-link/route";
 
+export const dynamic = "force-dynamic";
 export const runtime = "edge";
 
 const SlugPage = ({ params }: { params: { slug: string } }) => {
@@ -21,10 +22,17 @@ const SlugPage = ({ params }: { params: { slug: string } }) => {
   const fetchLink = async () => {
     if (!params.slug) return;
     try {
-      const responseData = await getLink({
-        slug: params.slug,
+      const response = await fetch("/api/get-link", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          slug: params.slug,
+        } as GetLinkRequest),
       });
-      if (responseData.status === "error") {
+      const responseData: GetLinkResponse = await response.json();
+      if (responseData.status === "error" || !response.ok) {
         throw new Error(responseData.message);
       }
       if (responseData.status === "success" && responseData.linkData) {

@@ -12,7 +12,6 @@ const HomePage = () => {
   return (
     <>
       <Navbar />
-
       <main className="max-w-screen relative z-0 flex h-full min-h-screen w-full snap-both snap-proximity flex-col overflow-y-scroll pt-16">
         <Header />
         <Features />

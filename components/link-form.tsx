@@ -9,11 +9,14 @@ import { ToastAction } from "./ui/toast";
 import { cn } from "@/lib/utils";
 import LinkOptionsDialog from "./header/link-options";
 import { useAtom, useAtomValue } from "jotai";
-import { generatedLinksAtom, linkExpiryAtom } from "./atoms/user-settings";
-import useUser from "./hooks/use-user";
+import { generatedLinksAtom, linkExpiryAtom } from "../atoms/user-settings";
+import useUser from "../hooks/use-user";
 import { LinkDocument } from "@/types/documents";
 import GeneratedLinkCard from "./header/generated-link-card";
-import { createLink } from "@/lib/actions/create-link";
+import {
+  CreateLinkRequest,
+  CreateLinkResponse,
+} from "@/app/api/create-link/route";
 
 const LinkForm = ({
   creatingLink,
@@ -49,14 +52,22 @@ const LinkForm = ({
     }
 
     try {
-      const responseData = await createLink({
-        url,
-        password,
-        userId: user?.uid,
-        slug: slug,
-        expiry: linkExpiry,
+      const response = await fetch("/api/create-link", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          url,
+          password,
+          userId: user?.uid,
+          slug: slug,
+          expiry: linkExpiry,
+        } as CreateLinkRequest),
       });
-      if (responseData.status === "error") {
+      const responseData: CreateLinkResponse = await response.json();
+      console.log("🚀 => responseData:", responseData);
+      if (responseData.status === "error" || !response.ok) {
         throw new Error(responseData.message);
       }
 

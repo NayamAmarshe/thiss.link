@@ -25,8 +25,8 @@ import {
   downloadQrCodeAtom,
   LinkExpiry,
   linkExpiryAtom,
-} from "../atoms/user-settings";
-import useUser from "../hooks/use-user";
+} from "../../atoms/user-settings";
+import useUser from "../../hooks/use-user";
 import { useEffect, useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { ToastAction } from "../ui/toast";

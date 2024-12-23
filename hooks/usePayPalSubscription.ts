@@ -4,12 +4,15 @@ import {
   DISPATCH_ACTION,
   usePayPalScriptReducer,
 } from "@paypal/react-paypal-js";
-import useUser from "@/components/hooks/use-user";
+import useUser from "@/hooks/use-user";
 import {
   PayPalButtonCreateSubscription,
   PayPalButtonOnApprove,
 } from "@paypal/paypal-js";
-import { verifySubscription } from "@/lib/actions/verify-subscription";
+import {
+  VerifySubscriptionRequest,
+  VerifySubscriptionResponse,
+} from "@/app/api/verify-subscription/route";
 
 export const usePayPalSubscription = (planId: string) => {
   const [{ isResolved, isPending }, paypalDispatch] = usePayPalScriptReducer();
@@ -68,15 +71,23 @@ export const usePayPalSubscription = (planId: string) => {
     }
 
     try {
-      const response = await verifySubscription({
-        subscriptionId: data.subscriptionID,
-        userId: user.uid,
+      const response = await fetch("/api/verify-subscription", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subscriptionId: data.subscriptionID,
+          userId: user.uid,
+        } as VerifySubscriptionRequest),
       });
 
-      if (response.status === "error") {
+      const responseData: VerifySubscriptionResponse = await response.json();
+
+      if (responseData.status === "error" || !response.ok) {
         toast({
           title: "Error",
-          description: response.message,
+          description: responseData.message,
           variant: "destructive",
         });
         return;

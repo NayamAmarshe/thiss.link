@@ -1,12 +1,10 @@
-import { db } from "@/lib/firebase";
+import { NextResponse } from "next/server";
+import { db } from "@/lib/firebase/firebase";
 import { UserDocument } from "@/types/documents";
 import { doc, Timestamp, updateDoc } from "firebase/firestore";
-import { NextApiRequest, NextApiResponse } from "next";
-import { generateAccessToken } from "../generate-acces-token";
+import { generateAccessToken } from "@/lib/generate-acces-token";
 
 const base = process.env.PAYPAL_BASE_URL;
-
-export const runtime = "edge";
 
 export interface VerifySubscriptionRequest {
   subscriptionId: string;
@@ -18,13 +16,16 @@ export type VerifySubscriptionResponse = {
   message: string;
 };
 
-export async function verifySubscription({
-  subscriptionId,
-  userId,
-}: VerifySubscriptionRequest): Promise<VerifySubscriptionResponse> {
+export async function POST(request: Request): Promise<Response> {
   try {
+    const body = await request.json();
+    const { subscriptionId, userId }: VerifySubscriptionRequest = body;
+
     if (!subscriptionId || !userId) {
-      return { status: "error", message: "Missing required parameters" };
+      return NextResponse.json<VerifySubscriptionResponse>(
+        { status: "error", message: "Missing required parameters" },
+        { status: 400 },
+      );
     }
 
     const token = await generateAccessToken();
@@ -39,6 +40,17 @@ export async function verifySubscription({
         },
       },
     );
+
+    if (!subscriptionRes.ok) {
+      console.error(
+        "Failed to fetch subscription details:",
+        subscriptionRes.statusText,
+      );
+      return NextResponse.json<VerifySubscriptionResponse>(
+        { status: "error", message: "Failed to fetch subscription details" },
+        { status: subscriptionRes.status },
+      );
+    }
 
     const subscription = await subscriptionRes.json();
     console.log("🚀 => subscription:", subscription);
@@ -60,11 +72,18 @@ export async function verifySubscription({
       },
       updatedAt: new Date().toISOString(),
     };
+
     await updateDoc(userRef, userData);
 
-    return { status: "success", message: "Subscription verified" };
+    return NextResponse.json<VerifySubscriptionResponse>(
+      { status: "success", message: "Subscription verified" },
+      { status: 200 },
+    );
   } catch (error) {
     console.error("Error verifying subscription:", error);
-    return { status: "error", message: "Internal server error" };
+    return NextResponse.json<VerifySubscriptionResponse>(
+      { status: "error", message: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

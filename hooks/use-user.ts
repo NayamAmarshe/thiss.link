@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 import {
   GoogleAuthProvider,
   User,
-  onAuthStateChanged,
   signInWithPopup,
+  onAuthStateChanged as _onAuthStateChanged,
+  ErrorFn,
+  NextOrObserver,
 } from "firebase/auth";
-import { auth, db } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase/firebase";
 import { UserDocument } from "@/types/documents";
-import { createUser } from "@/lib/actions/create-user";
+import { CreateUserRequest } from "@/app/api/create-user/route";
 
 /**
  * Custom hook for managing user data and tasks.
@@ -26,11 +28,21 @@ const useUser = () => {
     try {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
-      const createUserResponse = await createUser({
-        user: userCredential.user,
+      const response = await fetch("/api/create-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user: userCredential.user,
+        } as CreateUserRequest),
       });
-      if (createUserResponse.status === "error") {
-        throw new Error(createUserResponse.message);
+      if (!response.ok) {
+        throw new Error("Failed to create user");
+      }
+      const responseData = await response.json();
+      if (responseData.status === "error" || !response.ok) {
+        throw new Error(responseData.message);
       }
     } catch (error) {
       console.error("Error signing in:", error);
@@ -39,21 +51,23 @@ const useUser = () => {
     }
   };
 
+  function onAuthStateChanged(
+    callback: NextOrObserver<User>,
+    errorCallback?: ErrorFn,
+  ) {
+    return _onAuthStateChanged(auth, callback, errorCallback);
+  }
+
   useEffect(() => {
-    const listener = onAuthStateChanged(
-      auth,
-      async (user) => {
-        if (user) {
-          setLoggedIn(true);
-          setUser(user);
-        }
-        setUserLoading(false);
-      },
-      setError,
-    );
-    return () => {
-      listener();
-    };
+    const unsubscribe = onAuthStateChanged(async (user) => {
+      if (user) {
+        setLoggedIn(true);
+        setUser(user);
+      }
+      setUserLoading(false);
+    }, setError);
+
+    return () => unsubscribe();
   }, [auth]);
 
   useEffect(() => {

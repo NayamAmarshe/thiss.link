@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "maglit"
-  }
+    "production": "thiss-link"
+  },
+  "targets": {},
+  "etags": {}
 }
