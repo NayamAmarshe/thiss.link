@@ -11,9 +11,6 @@ import { LinkDocument } from "@/types/documents";
 import { useRouter } from "next/navigation";
 import { GetLinkRequest, GetLinkResponse } from "../api/get-link/route";
 
-export const dynamic = "force-dynamic";
-export const runtime = "edge";
-
 const SlugPage = ({ params }: { params: { slug: string } }) => {
   const router = useRouter();
 

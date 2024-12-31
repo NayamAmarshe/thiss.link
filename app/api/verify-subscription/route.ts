@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase/firebase";
 import { UserDocument } from "@/types/documents";
 import { doc, Timestamp, updateDoc } from "firebase/firestore";
-import { generateAccessToken } from "@/lib/generate-acces-token";
+import { generateAccessToken } from "./generate-acces-token";
 
 const base = process.env.PAYPAL_BASE_URL;
 

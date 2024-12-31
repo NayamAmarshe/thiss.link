@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
 import { popInAnimation } from "@/lib/motion";
@@ -5,7 +7,6 @@ import Link from "next/link";
 import { toast } from "@/hooks/use-toast";
 import { LinkDocument } from "@/types/documents";
 import { ToastAction } from "../ui/toast";
-import { LinkIcon } from "lucide-react";
 import { FaClipboard, FaLink, FaList } from "react-icons/fa";
 
 const GeneratedLinkCard = ({

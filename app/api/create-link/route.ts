@@ -1,10 +1,10 @@
 import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase/firebase";
 import { encryptUrl } from "@/lib/encrypt-url";
-import { googleSafeBrowsingCheck } from "@/lib/safe-browsing";
 import Monkey from "monkey-typewriter";
 import { NextResponse } from "next/server";
 import { LinkDocument } from "@/types/documents";
+import { googleSafeBrowsingCheck } from "./safe-browsing";
 
 export type CreateLinkRequest = {
   slug: string;
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
         return NextResponse.json<CreateLinkResponse>(
           {
             status: "error",
-            message: "Slug must be between 3 and 50 characters",
+            message: "Slug must be between 3 and 50 characters.",
           },
           { status: 400 },
         );

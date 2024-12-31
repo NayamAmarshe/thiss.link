@@ -36,3 +36,6 @@ yarn-error.log*
 # firebase
 *-debug.log
 data/
+.env
+.wrangler
+wrangler.toml

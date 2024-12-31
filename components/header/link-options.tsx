@@ -27,7 +27,7 @@ import {
   linkExpiryAtom,
 } from "../../atoms/user-settings";
 import useUser from "../../hooks/use-user";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { ToastAction } from "../ui/toast";
 
@@ -44,19 +44,35 @@ const LinkOptionsDialog = ({
 
   const { isLoggedIn } = useUser();
 
-  useEffect(() => {
+  const checkSlug = useCallback(() => {
+    console.log("Checking slug");
+    const slugRegex = /^[a-zA-Z0-9_-]+$/;
     if (!slug) {
+      console.log("Slug is required");
       setError(null);
       return;
     }
-    const slugRegex = /^[a-zA-Z0-9_-]+$/;
     if (slug.length < 3 || slug.length > 50) {
-      setError("Slug must be between 3 and 50 characters");
+      const error = "Slug must be between 3 and 50 characters.";
+      console.log(error);
+      setError(error);
+
+      return;
     }
     if (!slugRegex.test(slug)) {
-      setError("Slug can only contain letters, numbers, dash and underscore");
+      const error =
+        "Slug can only contain letters, numbers, dash and underscore.";
+      console.error(error);
+      setError(error);
+      return;
     }
+
+    setError(null);
   }, [slug]);
+
+  useEffect(() => {
+    checkSlug();
+  }, [slug, checkSlug]);
 
   return (
     <Dialog>
@@ -145,6 +161,7 @@ const LinkOptionsDialog = ({
             <Button
               type={error ? "button" : "submit"}
               onClick={(e) => {
+                checkSlug();
                 if (error) {
                   toast({
                     title: "Error",
