@@ -18,7 +18,11 @@ import "../styles/globals.css";
 export const Providers = ({ children }) => {
   return (
     <Provider>
-      <ThemeProvider attribute="class" defaultTheme="light">
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="light"
+        enableSystem={false}
+      >
         <PayPalScriptProvider
           options={{
             clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "",

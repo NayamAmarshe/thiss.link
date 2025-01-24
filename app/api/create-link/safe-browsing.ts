@@ -1,12 +1,14 @@
+export const dynamic = "force-dynamic";
+
 export const googleSafeBrowsingCheck = async (url: string) => {
   try {
-    const apiKey = process.env.SAFE_BROWSING_API_KEY;
+    const SAFE_BROWSING_API_KEY = process.env.SAFE_BROWSING_API_KEY;
 
-    if (!apiKey) {
+    if (!SAFE_BROWSING_API_KEY) {
       throw new Error("API key not found.");
     }
     const response = await fetch(
-      "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=" + apiKey,
+      `https://safebrowsing.googleapis.com/v4/threatMatches:find?key=${SAFE_BROWSING_API_KEY}`,
       {
         method: "POST",
         headers: {

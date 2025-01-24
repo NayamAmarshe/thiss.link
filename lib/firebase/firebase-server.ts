@@ -4,8 +4,9 @@ import "server-only";
 
 import { initializeServerApp } from "firebase/app";
 
-import { getAuth } from "firebase/auth";
+import { connectAuthEmulator, getAuth } from "firebase/auth";
 import { firebaseConfig } from "./config";
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 
 export async function getAuthenticatedAppForUser() {
   const headers = require("next/headers").headers();
@@ -22,6 +23,17 @@ export async function getAuthenticatedAppForUser() {
 
   const auth = getAuth(firebaseServerApp);
   await auth.authStateReady();
+  const db = getFirestore(firebaseServerApp);
 
-  return { firebaseServerApp, currentUser: auth.currentUser };
+  if (process.env.NODE_ENV == "development") {
+    connectAuthEmulator(auth, "http://127.0.0.1:9099");
+    connectFirestoreEmulator(db, "127.0.0.1", 8080);
+  }
+
+  return {
+    firebaseServerApp,
+    currentUser: auth.currentUser,
+    serverAuth: auth,
+    serverDb: db,
+  };
 }

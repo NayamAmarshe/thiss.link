@@ -2,7 +2,8 @@
   "name": "thiss.link",
   "private": true,
   "scripts": {
-    "dev": "firebase emulators:start --import=./data --export-on-exit & next dev",
+    "firebase": "firebase emulators:start --import=./data --export-on-exit",
+    "dev": "npm run firebase & next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -10,11 +11,13 @@
     "docker": "docker-compose up",
     "docker:d": "docker-compose up -d",
     "stop": "pkill java firebase; for port in 4000 4001 4002 9150; do lsof -t -i:$port | xargs -r kill; done",
-    "pages:build": "npx @cloudflare/next-on-pages",
-    "preview": "npm run pages:build && wrangler pages dev",
-    "deploy": "npm run pages:build && wrangler pages deploy"
+    "build:worker": "opennextjs-cloudflare",
+    "dev:worker": "wrangler dev --port 8771",
+    "preview:worker": "npm run build:worker && npm run dev:worker",
+    "deploy:worker": "npm run build:worker && wrangler deploy"
   },
   "dependencies": {
+    "@opennextjs/aws": "^3.3.1",
     "@paypal/paypal-js": "^8.1.2",
     "@paypal/react-paypal-js": "^8.7.0",
     "@radix-ui/react-accordion": "^1.2.1",
@@ -47,15 +50,15 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@cloudflare/next-on-pages": "^1.13.7",
+    "@opennextjs/cloudflare": "^0.3.3",
     "@types/react": "18.3.3",
     "autoprefixer": "^10.4.20",
-    "eslint-plugin-next-on-pages": "^1.13.7",
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
     "prettier-plugin-sort-imports": "^1.8.6",
     "prettier-plugin-tailwindcss": "^0.6.9",
-    "tailwindcss": "^3.4.16"
+    "tailwindcss": "^3.4.16",
+    "wrangler": "^3.99.0"
   },
   "volta": {
     "node": "20.11.0"

@@ -1,7 +1,9 @@
-import { db } from "@/lib/firebase/firebase";
+import { db } from "@/lib/firebase";
 import { UserDocument } from "@/types/documents";
 import { collection, doc, getDoc, setDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
 
 export interface CreateUserRequest {
   user: {

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { doc, getDoc, deleteDoc, Timestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase/firebase";
+import { db } from "@/lib/firebase";
 import { LinkDocument } from "@/types/documents";
 
 export interface GetLinkRequest {
@@ -11,6 +11,8 @@ export type GetLinkResponse = {
   message: string;
   linkData?: LinkDocument;
 };
+
+export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   const body = await request.json();

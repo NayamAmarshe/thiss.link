@@ -8,7 +8,7 @@ import {
   ErrorFn,
   NextOrObserver,
 } from "firebase/auth";
-import { auth, db } from "@/lib/firebase/firebase";
+import { auth, db } from "@/lib/firebase";
 import { UserDocument } from "@/types/documents";
 import { CreateUserRequest } from "@/app/api/create-user/route";
 

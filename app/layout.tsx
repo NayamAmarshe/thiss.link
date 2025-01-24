@@ -2,7 +2,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
 import { Providers } from "@/components/providers";
 import { connectFirestoreEmulator } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase/firebase";
+import { auth, db } from "@/lib/firebase";
 import { connectAuthEmulator } from "firebase/auth";
 
 export const metadata = {

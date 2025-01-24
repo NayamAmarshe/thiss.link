@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/firebase/firebase";
+import { db } from "@/lib/firebase";
 import { UserDocument } from "@/types/documents";
 import { doc, Timestamp, updateDoc } from "firebase/firestore";
 import { generateAccessToken } from "./generate-acces-token";
 
 const base = process.env.PAYPAL_BASE_URL;
+
+export const dynamic = "force-dynamic";
 
 export interface VerifySubscriptionRequest {
   subscriptionId: string;

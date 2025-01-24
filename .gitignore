@@ -39,3 +39,5 @@ data/
 .env
 .wrangler
 wrangler.toml
+.open-next
+.dev.vars

@@ -1,10 +1,10 @@
 import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase/firebase";
+import { db } from "@/lib/firebase";
 import { encryptUrl } from "@/lib/encrypt-url";
-import Monkey from "monkey-typewriter";
 import { NextResponse } from "next/server";
 import { LinkDocument } from "@/types/documents";
 import { googleSafeBrowsingCheck } from "./safe-browsing";
+import { generateWord } from "@/lib/generate-slug";
 
 export type CreateLinkRequest = {
   slug: string;
@@ -19,6 +19,8 @@ export type CreateLinkResponse = {
   message: string;
   linkData?: LinkDocument;
 };
+
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
@@ -115,7 +117,7 @@ export async function POST(req: Request) {
 
     // Generate slug if not provided
     if (!slug || (slug && !userId)) {
-      slug = Monkey.word();
+      slug = generateWord();
     }
 
     // Check if slug is already in use
@@ -162,15 +164,16 @@ export async function POST(req: Request) {
 
     await Promise.all(setDocPromises);
 
+    const isDev = process.env.NODE_ENV === "development";
+
     const responseData: CreateLinkResponse = {
       status: "success",
       message: "Link created successfully",
       linkData: {
         createdAt: new Date().getTime(),
-        link:
-          process.env.NODE_ENV === "development"
-            ? `http://localhost:3000/${slug}`
-            : `https://thiss.link/${slug}`,
+        link: isDev
+          ? `http://localhost:3000/${slug}`
+          : `https://thiss.link/${slug}`,
         slug,
         expiresAt: expiresAt ? expiresAt.getTime() : null,
         isProtected,
@@ -181,7 +184,11 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error(error);
     return NextResponse.json<CreateLinkResponse>(
-      { status: "error", message: "Something went wrong, please try again" },
+      {
+        status: "error",
+        message:
+          "Something went wrong, please try again. " + JSON.stringify(error),
+      },
       { status: 500 },
     );
   }
