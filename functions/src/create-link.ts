@@ -145,7 +145,7 @@ export const createLinkHandler = async (
       slug,
       isProtected,
       createdAt: Timestamp.fromDate(new Date()),
-      expiresAt: Timestamp.fromDate(expiresAt),
+      ...(expiresAt && { expiresAt: Timestamp.fromDate(expiresAt) }),
     };
 
     // Write data to Firestore
@@ -171,12 +171,12 @@ export const createLinkHandler = async (
       status: "success",
       message: "Link created successfully",
       linkData: {
-        createdAt: new Date().getTime(),
+        createdAt: Timestamp.fromDate(new Date()),
         link: isDev
           ? `http://localhost:3000/${slug}`
           : `https://thiss.link/${slug}`,
         slug,
-        expiresAt: expiresAt ? expiresAt.getTime() : null,
+        expiresAt: expiresAt ? Timestamp.fromDate(expiresAt) : null,
         isProtected,
       },
     };

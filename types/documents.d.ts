@@ -1,4 +1,4 @@
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from "@google-cloud/firestore";
 
 export type UserDocument = {
   uid: string;
