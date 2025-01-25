@@ -1,6 +1,7 @@
 {
   "projects": {
-    "production": "thiss-link"
+    "production": "thiss-link",
+    "default": "thiss-link"
   },
   "targets": {},
   "etags": {}

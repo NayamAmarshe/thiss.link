@@ -10,14 +10,9 @@
     "docker:build": "docker-compose build",
     "docker": "docker-compose up",
     "docker:d": "docker-compose up -d",
-    "stop": "pkill java firebase; for port in 4000 4001 4002 9150; do lsof -t -i:$port | xargs -r kill; done",
-    "build:worker": "opennextjs-cloudflare",
-    "dev:worker": "wrangler dev --port 8771",
-    "preview:worker": "npm run build:worker && npm run dev:worker",
-    "deploy:worker": "npm run build:worker && wrangler deploy"
+    "stop": "pkill java firebase; for port in 4000 4001 4002 9150; do lsof -t -i:$port | xargs -r kill; done"
   },
   "dependencies": {
-    "@opennextjs/aws": "^3.3.1",
     "@paypal/paypal-js": "^8.1.2",
     "@paypal/react-paypal-js": "^8.7.0",
     "@radix-ui/react-accordion": "^1.2.1",
@@ -33,7 +28,7 @@
     "eslint-config-next": "^14.2.21",
     "faker": "^6.6.6",
     "faker-js": "^1.0.0",
-    "firebase": "^11.0.2",
+    "firebase": "^11.2.0",
     "jotai": "^2.10.3",
     "lucide-react": "^0.468.0",
     "monkey-typewriter": "^1.0.14",
@@ -50,7 +45,6 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@opennextjs/cloudflare": "^0.3.3",
     "@types/react": "18.3.3",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
@@ -61,6 +55,6 @@
     "wrangler": "^3.99.0"
   },
   "volta": {
-    "node": "20.11.0"
+    "node": "22.13.1"
   }
 }

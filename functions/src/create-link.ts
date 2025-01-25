@@ -1,10 +1,10 @@
-import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { encryptUrl } from "@/lib/encrypt-url";
-import { NextResponse } from "next/server";
-import { LinkDocument } from "@/types/documents";
+import { Firestore, Timestamp } from "firebase-admin/firestore";
+import { LinkDocument } from "../../types/documents";
+import { Request } from "firebase-functions/https";
+import { Response } from "express";
+import { encryptUrl } from "../../lib/encrypt-url";
 import { googleSafeBrowsingCheck } from "./safe-browsing";
-import { generateWord } from "@/lib/generate-slug";
+import Monkey from "monkey-typewriter";
 
 export type CreateLinkRequest = {
   slug: string;
@@ -20,11 +20,13 @@ export type CreateLinkResponse = {
   linkData?: LinkDocument;
 };
 
-export const dynamic = "force-dynamic";
-
-export async function POST(req: Request) {
+export const createLinkHandler = async (
+  req: Request,
+  res: Response<CreateLinkResponse>,
+  db: Firestore,
+) => {
   try {
-    const body: CreateLinkRequest = await req.json();
+    const body: CreateLinkRequest = req.body.data;
     const {
       url,
       password,
@@ -41,42 +43,40 @@ export async function POST(req: Request) {
     }
 
     if (!url) {
-      return NextResponse.json<CreateLinkResponse>(
-        { status: "error", message: "Missing required fields" },
-        { status: 400 },
-      );
+      res.status(400).send({
+        status: "error",
+        message: "Missing required fields",
+      });
+      return;
     }
 
     // Validate URL
     const urlRegex = /^(https?:\/\/|ftp:\/\/|magnet:\?).+/i;
     if (!urlRegex.test(url)) {
-      return NextResponse.json<CreateLinkResponse>(
-        { status: "error", message: "Invalid URL" },
-        { status: 400 },
-      );
+      res.status(400).json({
+        status: "error",
+        message: "Invalid URL",
+      });
+      return;
     }
 
     // Validate slug
     if (slug) {
       const slugRegex = /^[a-zA-Z0-9_-]+$/;
       if (slug.length < 3 || slug.length > 50) {
-        return NextResponse.json<CreateLinkResponse>(
-          {
-            status: "error",
-            message: "Slug must be between 3 and 50 characters.",
-          },
-          { status: 400 },
-        );
+        res.status(400).json({
+          status: "error",
+          message: "Slug must be between 3 and 50 characters.",
+        });
+        return;
       }
       if (!slugRegex.test(slug)) {
-        return NextResponse.json<CreateLinkResponse>(
-          {
-            status: "error",
-            message:
-              "Slug can only contain letters, numbers, dash, and underscore",
-          },
-          { status: 400 },
-        );
+        res.status(400).json({
+          status: "error",
+          message:
+            "Slug can only contain letters, numbers, dash, and underscore",
+        });
+        return;
       }
     }
 
@@ -84,10 +84,11 @@ export async function POST(req: Request) {
     try {
       await googleSafeBrowsingCheck(url);
     } catch (error: any) {
-      return NextResponse.json<CreateLinkResponse>(
-        { status: "error", message: error.message },
-        { status: 400 },
-      );
+      res.status(400).json({
+        status: "error",
+        message: error.message,
+      });
+      return;
     }
 
     // Calculate expiration date
@@ -117,19 +118,17 @@ export async function POST(req: Request) {
 
     // Generate slug if not provided
     if (!slug || (slug && !userId)) {
-      slug = generateWord();
+      slug = Monkey.word();
     }
 
     // Check if slug is already in use
-    const slugDoc = await getDoc(doc(db, `new-links/${slug}`));
-    if (slugDoc.exists()) {
-      return NextResponse.json<CreateLinkResponse>(
-        {
-          status: "error",
-          message: "This slug is already in use. Please try another one.",
-        },
-        { status: 400 },
-      );
+    const slugDoc = await db.collection("new-links").doc(slug).get();
+    if (slugDoc.exists) {
+      res.status(400).json({
+        status: "error",
+        message: "This slug is already in use. Please try another one.",
+      });
+      return;
     }
 
     // Encrypt URL if password is provided
@@ -146,23 +145,25 @@ export async function POST(req: Request) {
       slug,
       isProtected,
       createdAt: Timestamp.fromDate(new Date()),
-      expiresAt: expiresAt ? Timestamp.fromDate(expiresAt) : null,
+      expiresAt: Timestamp.fromDate(expiresAt),
     };
 
     // Write data to Firestore
-    const setDocPromises = [setDoc(doc(db, `new-links/${slug}`), linkData)];
+    const batch = db.batch();
+    batch.set(db.collection("new-links").doc(slug), linkData);
 
     if (userId) {
-      setDocPromises.push(
-        setDoc(doc(db, `users/${userId}/links/${slug}`), {
+      batch.set(
+        db.collection("users").doc(userId).collection("links").doc(slug),
+        {
           createdAt: new Date(),
           ...(expiresAt && { expiresAt }),
           slug,
-        }),
+        },
       );
     }
 
-    await Promise.all(setDocPromises);
+    await batch.commit();
 
     const isDev = process.env.NODE_ENV === "development";
 
@@ -180,16 +181,13 @@ export async function POST(req: Request) {
       },
     };
 
-    return NextResponse.json<CreateLinkResponse>(responseData, { status: 201 });
+    res.status(201).json(responseData);
   } catch (error) {
     console.error(error);
-    return NextResponse.json<CreateLinkResponse>(
-      {
-        status: "error",
-        message:
-          "Something went wrong, please try again. " + JSON.stringify(error),
-      },
-      { status: 500 },
-    );
+    res.status(500).json({
+      status: "error",
+      message:
+        "Something went wrong, please try again. " + JSON.stringify(error),
+    });
   }
-}
+};

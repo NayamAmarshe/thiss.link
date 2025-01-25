@@ -5,8 +5,8 @@ export type UserDocument = {
   email: string;
   photoURL: string | undefined;
   name: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
   subscription?: {
     planDuration?: "monthly" | "yearly";
     subscriptionId: string;
@@ -27,8 +27,8 @@ export type UserLinksDocument = {
 export type LinkDocument = {
   link: string;
   slug: string;
-  createdAt: Timestamp | number | null;
+  createdAt: Timestamp | null;
   ip?: string;
   isProtected?: boolean;
-  expiresAt?: Timestamp | number | null;
+  expiresAt?: Timestamp | null;
 };
