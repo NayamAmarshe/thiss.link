@@ -13,6 +13,7 @@
     "stop": "pkill java firebase; for port in 4000 4001 4002 9150; do lsof -t -i:$port | xargs -r kill; done"
   },
   "dependencies": {
+    "@firebase/firestore": "^4.7.6",
     "@paypal/paypal-js": "^8.1.2",
     "@paypal/react-paypal-js": "^8.7.0",
     "@radix-ui/react-accordion": "^1.2.1",
@@ -24,11 +25,15 @@
     "@radix-ui/react-toast": "^1.2.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "cors": "^2.8.5",
     "crypto-js": "^4.2.0",
     "eslint-config-next": "^14.2.21",
+    "express": "^4.21.2",
     "faker": "^6.6.6",
     "faker-js": "^1.0.0",
     "firebase": "^11.2.0",
+    "firebase-admin": "^13.0.2",
+    "firebase-functions": "^6.3.0",
     "jotai": "^2.10.3",
     "lucide-react": "^0.468.0",
     "monkey-typewriter": "^1.0.14",
@@ -45,6 +50,8 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
     "@types/react": "18.3.3",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
