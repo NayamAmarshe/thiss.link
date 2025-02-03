@@ -12,7 +12,9 @@ import {
 import {
   VerifySubscriptionRequest,
   VerifySubscriptionResponse,
-} from "@/app/api/verify-subscription/route";
+} from "@/functions/src/verify-subscription";
+import { httpsCallable } from "firebase/functions";
+import { functions } from "@/lib/firebase/firebase";
 
 export const usePayPalSubscription = (planId: string) => {
   const [{ isResolved, isPending }, paypalDispatch] = usePayPalScriptReducer();
@@ -71,23 +73,20 @@ export const usePayPalSubscription = (planId: string) => {
     }
 
     try {
-      const response = await fetch("/api/verify-subscription", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          subscriptionId: data.subscriptionID,
-          userId: user.uid,
-        } as VerifySubscriptionRequest),
+      const verifySubscription = httpsCallable<
+        VerifySubscriptionRequest,
+        VerifySubscriptionResponse
+      >(functions, "verifySubscription");
+
+      const responseData = await verifySubscription({
+        subscriptionId: data.subscriptionID,
+        userId: user.uid,
       });
 
-      const responseData: VerifySubscriptionResponse = await response.json();
-
-      if (responseData.status === "error" || !response.ok) {
+      if (responseData.data.status === "error") {
         toast({
           title: "Error",
-          description: responseData.message,
+          description: responseData.data.message,
           variant: "destructive",
         });
         return;

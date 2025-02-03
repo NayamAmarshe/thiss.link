@@ -1,9 +1,9 @@
 import { Firestore, Timestamp } from "firebase-admin/firestore";
-import { LinkDocument } from "../../types/documents";
+import { LinkDocument } from "../../../types/documents";
 import { Request } from "firebase-functions/https";
 import { Response } from "express";
-import { encryptUrl } from "../../lib/encrypt-url";
-import { googleSafeBrowsingCheck } from "./safe-browsing";
+import { encryptUrl } from "./encrypt-url";
+import { googleSafeBrowsingCheck } from "../safe-browsing";
 import Monkey from "monkey-typewriter";
 
 export type CreateLinkRequest = {

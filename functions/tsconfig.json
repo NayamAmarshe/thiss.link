@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "module": "NodeNext",
+    "rootDir": "src",
     "esModuleInterop": true,
     "moduleResolution": "nodenext",
     "noImplicitReturns": true,
@@ -10,8 +11,9 @@
     "sourceMap": true,
     "strict": true,
     "target": "es2017",
-    "types": ["node"]
+    "types": ["node"],
+    "baseUrl": "./"
   },
   "compileOnSave": true,
-  "include": ["src", "../app/api/verify-subscription/generate-acces-token.ts"]
+  "exclude": ["lib"]
 }

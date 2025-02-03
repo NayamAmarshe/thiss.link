@@ -13,6 +13,7 @@ import * as logger from "firebase-functions/logger";
 import { createLinkHandler } from "./create-link";
 import { createUserHandler } from "./create-user";
 import { getLinkHandler } from "./get-link";
+import { verifySubscriptionHandler } from "./verify-subscription";
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -40,3 +41,9 @@ export const createUser = functions.auth.user().onCreate(async (user) => {
 export const getLink = functions.https.onRequest(async (req, res) => {
   await getLinkHandler(req, res, db);
 });
+
+export const verifySubscription = functions.https.onRequest(
+  async (req, res) => {
+    await verifySubscriptionHandler(req, res, db);
+  },
+);
