@@ -15,9 +15,11 @@ export type CreateLinkRequest = {
 };
 
 export type CreateLinkResponse = {
-  status: string;
-  message: string;
-  linkData?: LinkDocument;
+  data: {
+    status: string;
+    message: string;
+    linkData?: LinkDocument;
+  };
 };
 
 export const createLinkHandler = async (
@@ -25,6 +27,8 @@ export const createLinkHandler = async (
   res: Response<CreateLinkResponse>,
   db: Firestore,
 ) => {
+  console.log("🚀 => req.body:", req.body);
+
   try {
     const body: CreateLinkRequest = req.body.data;
     const {
@@ -44,8 +48,10 @@ export const createLinkHandler = async (
 
     if (!url) {
       res.status(400).send({
-        status: "error",
-        message: "Missing required fields",
+        data: {
+          status: "error",
+          message: "Missing required fields",
+        },
       });
       return;
     }
@@ -53,9 +59,11 @@ export const createLinkHandler = async (
     // Validate URL
     const urlRegex = /^(https?:\/\/|ftp:\/\/|magnet:\?).+/i;
     if (!urlRegex.test(url)) {
-      res.status(400).json({
-        status: "error",
-        message: "Invalid URL",
+      res.status(400).send({
+        data: {
+          status: "error",
+          message: "Invalid URL",
+        },
       });
       return;
     }
@@ -64,17 +72,21 @@ export const createLinkHandler = async (
     if (slug) {
       const slugRegex = /^[a-zA-Z0-9_-]+$/;
       if (slug.length < 3 || slug.length > 50) {
-        res.status(400).json({
-          status: "error",
-          message: "Slug must be between 3 and 50 characters.",
+        res.status(400).send({
+          data: {
+            status: "error",
+            message: "Slug must be between 3 and 50 characters.",
+          },
         });
         return;
       }
       if (!slugRegex.test(slug)) {
-        res.status(400).json({
-          status: "error",
-          message:
-            "Slug can only contain letters, numbers, dash, and underscore",
+        res.status(400).send({
+          data: {
+            status: "error",
+            message:
+              "Slug can only contain letters, numbers, dash, and underscore",
+          },
         });
         return;
       }
@@ -84,9 +96,11 @@ export const createLinkHandler = async (
     try {
       await googleSafeBrowsingCheck(url);
     } catch (error: any) {
-      res.status(400).json({
-        status: "error",
-        message: error.message,
+      res.status(400).send({
+        data: {
+          status: "error",
+          message: error.message,
+        },
       });
       return;
     }
@@ -124,9 +138,11 @@ export const createLinkHandler = async (
     // Check if slug is already in use
     const slugDoc = await db.collection("new-links").doc(slug).get();
     if (slugDoc.exists) {
-      res.status(400).json({
-        status: "error",
-        message: "This slug is already in use. Please try another one.",
+      res.status(400).send({
+        data: {
+          status: "error",
+          message: "This slug is already in use. Please try another one.",
+        },
       });
       return;
     }
@@ -168,26 +184,30 @@ export const createLinkHandler = async (
     const isDev = process.env.NODE_ENV === "development";
 
     const responseData: CreateLinkResponse = {
-      status: "success",
-      message: "Link created successfully",
-      linkData: {
-        createdAt: Timestamp.fromDate(new Date()),
-        link: isDev
-          ? `http://localhost:3000/${slug}`
-          : `https://thiss.link/${slug}`,
-        slug,
-        expiresAt: expiresAt ? Timestamp.fromDate(expiresAt) : null,
-        isProtected,
+      data: {
+        status: "success",
+        message: "Link created successfully",
+        linkData: {
+          createdAt: Timestamp.fromDate(new Date()),
+          link: isDev
+            ? `http://localhost:3000/${slug}`
+            : `https://thiss.link/${slug}`,
+          slug,
+          expiresAt: expiresAt ? Timestamp.fromDate(expiresAt) : null,
+          isProtected,
+        },
       },
     };
 
-    res.status(201).json(responseData);
+    res.status(201).send(responseData);
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      status: "error",
-      message:
-        "Something went wrong, please try again. " + JSON.stringify(error),
+    res.status(500).send({
+      data: {
+        status: "error",
+        message:
+          "Something went wrong, please try again. " + JSON.stringify(error),
+      },
     });
   }
 };

@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "firebase": "firebase emulators:start --import=./data --export-on-exit",
-    "dev": "(rm -rf functions/lib && cd functions/ && npm run build && cd ..) && npm run firebase & next dev",
+    "dev": "(rm -rf functions/lib && cd functions/ && npm run build:watch & cd ..) && npm run firebase & next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

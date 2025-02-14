@@ -1,5 +1,4 @@
-import * as functions from "firebase-functions";
-const PAYPAL_CLIENT_ID = functions.config().NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
 const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
 

@@ -13,10 +13,12 @@ import { generatedLinksAtom, linkExpiryAtom } from "../atoms/user-settings";
 import useUser from "../hooks/use-user";
 import { LinkDocument } from "@/types/documents";
 import GeneratedLinkCard from "./header/generated-link-card";
+import { httpsCallable } from "firebase/functions";
+import { functions } from "../lib/firebase/firebase";
 import {
   CreateLinkRequest,
   CreateLinkResponse,
-} from "@/app/api/create-link/route";
+} from "../functions/src/create-link";
 
 const LinkForm = ({
   creatingLink,
@@ -52,38 +54,41 @@ const LinkForm = ({
     }
 
     try {
-      const response = await fetch("/api/create-link", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          url,
-          password,
-          userId: user?.uid,
-          slug: slug,
-          expiry: linkExpiry,
-        } as CreateLinkRequest),
-      });
-      const responseData: CreateLinkResponse = await response.json();
-      console.log("🚀 => responseData:", responseData);
-      if (responseData.status === "error" || !response.ok) {
-        throw new Error(responseData.message);
+      const createLink = httpsCallable<CreateLinkRequest, CreateLinkResponse>(
+        functions,
+        "createLink",
+      );
+      const responseData = await createLink({
+        url,
+        password,
+        userId: user?.uid,
+        slug,
+        expiry: linkExpiry,
+      } as CreateLinkRequest);
+      console.log("🚀 => handleSubmit => responseData:", responseData);
+
+      if (responseData.data.status === "error") {
+        toast({
+          title: "Error",
+          description: responseData.data.message,
+          variant: "destructive",
+        });
+        return;
       }
 
-      if (responseData.linkData) {
+      if (responseData.data.linkData) {
         toast({
           title: "Success",
           description: "thiss link has been copied to clipboard",
           action: <ToastAction altText="Got it">Got it</ToastAction>,
         });
-        setGeneratedLinks((prev) => [...prev, responseData.linkData!]);
-        setGeneratedLink(responseData.linkData);
+        setGeneratedLinks((prev) => [...prev, responseData.data.linkData!]);
+        setGeneratedLink(responseData.data.linkData);
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: "Error creating link",
+        description: error.message,
         action: <ToastAction altText="Got it">Got it</ToastAction>,
       });
     } finally {
