@@ -70,7 +70,7 @@ export const createLinkHandler = async (
         }
 
         // Check if user has reached monthly limit
-        if (currentUsage.count >= 5) {
+        if (slug.length && currentUsage.count >= 5) {
           return res.status(200).send({
             data: {
               status: "error",
@@ -176,7 +176,8 @@ export const createLinkHandler = async (
       return res.status(200).send({
         data: {
           status: "error",
-          message: "This slug is already in use. Please try another one.",
+          message:
+            "This custom link is already in use. Please try another one.",
         },
       });
     }
@@ -228,16 +229,15 @@ export const createLinkHandler = async (
 
     await batch.commit();
 
-    const isDev = process.env.NODE_ENV === "development";
-
     const responseData: CreateLinkResponse = {
       status: "success",
       message: "Link created successfully",
       linkData: {
         createdAt: Timestamp.fromDate(new Date()),
-        link: isDev
-          ? `http://localhost:3000/${slug}`
-          : `https://thiss.link/${slug}`,
+        link:
+          process.env.NODE_ENV === "development"
+            ? `http://localhost:3000/${slug}`
+            : `https://thiss.link/${slug}`,
         slug,
         expiresAt: expiresAt ? Timestamp.fromDate(expiresAt) : null,
         isProtected,

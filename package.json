@@ -3,14 +3,14 @@
   "private": true,
   "scripts": {
     "firebase": "firebase emulators:start --import=./data --export-on-exit",
-    "dev": "npm run firebase & next dev &",
+    "dev": "NODE_ENV=\"development\" npm run firebase & next dev &",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "docker:build": "docker-compose build",
     "docker": "docker-compose up",
     "docker:d": "docker-compose up -d",
-    "stop": "pkill java firebase; for port in 4000 4001 4002 9150; do lsof -t -i:$port | xargs -r kill; done"
+    "stop": "pkill java firebase; for port in 3000 3001 3002 3003 4000 4001 4002 9150; do lsof -t -i:$port | xargs -r kill; done"
   },
   "dependencies": {
     "@firebase/firestore": "^4.7.6",
