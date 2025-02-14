@@ -27,9 +27,9 @@ export const createLink = onRequest(
     timeoutSeconds: 60,
     region: ["us-central1"],
   },
-  (request, response) => {
+  async (request, response) => {
     logger.info("createLink called!", { structuredData: true });
-    return createLinkHandler(request, response, db);
+    await createLinkHandler(request, response, db);
   },
 );
 
@@ -44,9 +44,9 @@ export const getLink = onRequest(
     timeoutSeconds: 60,
     region: ["us-central1"],
   },
-  (request, response) => {
+  async (request, response) => {
     logger.info("getLink called!", { structuredData: true });
-    getLinkHandler(request, response, db);
+    await getLinkHandler(request, response, db);
   },
 );
 

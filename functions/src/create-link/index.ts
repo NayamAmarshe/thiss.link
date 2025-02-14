@@ -1,5 +1,5 @@
 import { Firestore, Timestamp } from "firebase-admin/firestore";
-import { LinkDocument } from "../../../types/documents";
+import { LinkDocument, UserDocument } from "../../../types/documents";
 import { Request } from "firebase-functions/https";
 import { Response } from "express";
 import { encryptUrl } from "./encrypt-url";
@@ -40,53 +40,90 @@ export const createLinkHandler = async (
     let slug = providedSlug || "";
     let expiry = providedExpiry;
 
+    // If user is not logged in, disable premium features
     if (!userId) {
       expiry = undefined;
+      slug = "";
+    } else {
+      // Check subscription status for logged-in users
+      const userDoc = await db.collection("users").doc(userId).get();
+      const userData = userDoc.data() as UserDocument;
+      const hasActiveSubscription = userData?.subscription?.status === "ACTIVE";
+
+      // If no active subscription, check custom link limits and update usage
+      if (!hasActiveSubscription) {
+        expiry = undefined;
+
+        // Initialize or check monthly usage
+        const now = new Date();
+        const currentUsage = userData.customLinksUsage || {
+          count: 0,
+          monthlyReset: Timestamp.fromDate(now),
+        };
+
+        // Reset counter if we're in a new month
+        if (now.getTime() > currentUsage.monthlyReset.toDate().getTime()) {
+          currentUsage.count = 0;
+          currentUsage.monthlyReset = Timestamp.fromDate(
+            new Date(now.getFullYear(), now.getMonth() + 1, 1),
+          );
+        }
+
+        // Check if user has reached monthly limit
+        if (currentUsage.count >= 5) {
+          return res.status(200).send({
+            data: {
+              status: "error",
+              message:
+                "You have reached the limit of 5 custom links for this month. Please upgrade to create more custom links.",
+            },
+          });
+        }
+
+        // Store current usage for later update after successful creation
+        userData.customLinksUsage = currentUsage;
+      }
     }
 
     if (!url) {
-      res.status(400).send({
+      return res.status(200).send({
         data: {
           status: "error",
           message: "Missing required fields",
         },
       });
-      return;
     }
 
     // Validate URL
     const urlRegex = /^(https?:\/\/|ftp:\/\/|magnet:\?).+/i;
     if (!urlRegex.test(url)) {
-      res.status(400).send({
+      return res.status(200).send({
         data: {
           status: "error",
           message: "Invalid URL",
         },
       });
-      return;
     }
 
     // Validate slug
     if (slug) {
       const slugRegex = /^[a-zA-Z0-9_-]+$/;
       if (slug.length < 3 || slug.length > 50) {
-        res.status(400).send({
+        return res.status(200).send({
           data: {
             status: "error",
             message: "Slug must be between 3 and 50 characters.",
           },
         });
-        return;
       }
       if (!slugRegex.test(slug)) {
-        res.status(400).send({
+        return res.status(200).send({
           data: {
             status: "error",
             message:
               "Slug can only contain letters, numbers, dash, and underscore",
           },
         });
-        return;
       }
     }
 
@@ -94,13 +131,12 @@ export const createLinkHandler = async (
     try {
       await googleSafeBrowsingCheck(url);
     } catch (error: any) {
-      res.status(400).send({
+      return res.status(200).send({
         data: {
           status: "error",
           message: error.message,
         },
       });
-      return;
     }
 
     // Calculate expiration date
@@ -125,6 +161,7 @@ export const createLinkHandler = async (
           break;
       }
     } else if (!expiry && !userId) {
+      // Default expiration date for non-premium users
       expiresAt = new Date(new Date().setMonth(new Date().getMonth() + 6));
     }
 
@@ -136,13 +173,12 @@ export const createLinkHandler = async (
     // Check if slug is already in use
     const slugDoc = await db.collection("new-links").doc(slug).get();
     if (slugDoc.exists) {
-      res.status(400).send({
+      return res.status(200).send({
         data: {
           status: "error",
           message: "This slug is already in use. Please try another one.",
         },
       });
-      return;
     }
 
     // Encrypt URL if password is provided
@@ -175,6 +211,19 @@ export const createLinkHandler = async (
           slug,
         },
       );
+
+      // Only increment usage after successful creation for non-premium users
+      const userData = (
+        await db.collection("users").doc(userId).get()
+      ).data() as UserDocument;
+      if (userData?.customLinksUsage && !userData?.subscription?.status) {
+        batch.update(db.collection("users").doc(userId), {
+          customLinksUsage: {
+            count: userData.customLinksUsage.count + 1,
+            monthlyReset: userData.customLinksUsage.monthlyReset,
+          },
+        });
+      }
     }
 
     await batch.commit();
@@ -195,10 +244,10 @@ export const createLinkHandler = async (
       },
     };
 
-    res.status(201).send({ data: responseData });
+    return res.status(201).send({ data: responseData });
   } catch (error) {
     console.error(error);
-    res.status(500).send({
+    return res.status(500).send({
       data: {
         status: "error",
         message:

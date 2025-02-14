@@ -1,3 +1,6 @@
+import { useToast } from "@/hooks/use-toast";
+import useUser from "@/hooks/use-user";
+import { User } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import { FaSave, FaWrench } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
@@ -26,10 +29,11 @@ import {
   LinkExpiry,
   linkExpiryAtom,
 } from "../../atoms/user-settings";
-import useUser from "../../hooks/use-user";
 import { useCallback, useEffect, useState } from "react";
-import { toast } from "@/hooks/use-toast";
 import { ToastAction } from "../ui/toast";
+import { StarIcon } from "lucide-react";
+
+// Extend the Firebase User type
 
 const LinkOptionsDialog = ({
   slug,
@@ -41,8 +45,12 @@ const LinkOptionsDialog = ({
   const [linkExpiry, setLinkExpiry] = useAtom(linkExpiryAtom);
   const [downloadQrCode, setDownloadQrCode] = useAtom(downloadQrCodeAtom);
   const [error, setError] = useState<string | null>(null);
+  const { isLoggedIn, user, userDocument } = useUser();
+  const { toast } = useToast();
 
-  const { isLoggedIn } = useUser();
+  const hasActiveSubscription = userDocument?.subscription?.status === "ACTIVE";
+
+  const canUseCustomLinks = (userDocument?.customLinksUsage?.count || 0) < 5;
 
   const checkSlug = useCallback(() => {
     console.log("Checking slug");
@@ -90,12 +98,14 @@ const LinkOptionsDialog = ({
         <DialogHeader>
           <DialogTitle>Link Options</DialogTitle>
           <DialogDescription>
-            {isLoggedIn ? (
-              "Make changes to your link here."
-            ) : (
-              <span className="font-semibold text-red-500">
-                Sign in to make changes to your link.
-              </span>
+            Customize your link with these options.
+            {isLoggedIn && !hasActiveSubscription && (
+              <div className="bg-muted mt-2 flex items-center gap-1 rounded-md bg-main p-2 text-sm">
+                <StarIcon className="h-4 w-4" />
+                {canUseCustomLinks
+                  ? "Upgrade to set link expiry."
+                  : "Upgrade to use custom links and link expiry features."}
+              </div>
             )}
           </DialogDescription>
         </DialogHeader>
@@ -112,7 +122,7 @@ const LinkOptionsDialog = ({
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
                 className="w-full pl-[118px] font-semibold"
-                disabled={!isLoggedIn}
+                disabled={!isLoggedIn || !canUseCustomLinks}
               />
             </div>
           </div>
@@ -134,6 +144,15 @@ const LinkOptionsDialog = ({
                 id="disable-link-expiry"
                 checked={!!linkExpiry}
                 onCheckedChange={(checked) => {
+                  if (!hasActiveSubscription && checked) {
+                    toast({
+                      title: "Premium Feature",
+                      description:
+                        "Link expiry is only available with a subscription",
+                      variant: "default",
+                    });
+                    return;
+                  }
                   setLinkExpiry(checked ? "24-hours" : undefined);
                 }}
                 disabled={!isLoggedIn}
@@ -141,7 +160,7 @@ const LinkOptionsDialog = ({
               <Select
                 onValueChange={(value) => setLinkExpiry(value as LinkExpiry)}
                 value={linkExpiry as string | undefined}
-                disabled={!linkExpiry || !isLoggedIn}
+                disabled={!linkExpiry || !isLoggedIn || !hasActiveSubscription}
               >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Never" />

@@ -24,7 +24,7 @@ export const getLinkHandler = async (
     const { slug } = body;
 
     if (!slug) {
-      return res.status(400).send({
+      return res.status(200).send({
         data: {
           status: "error",
           message: "Slug is required",
@@ -36,7 +36,7 @@ export const getLinkHandler = async (
     const linkDoc = await linkRef.get();
 
     if (!linkDoc.exists) {
-      return res.status(404).send({
+      return res.status(200).send({
         data: {
           status: "error",
           message: "Link not found",
@@ -52,7 +52,7 @@ export const getLinkHandler = async (
       if (linkData.expiresAt.toDate().getTime() <= now) {
         // Delete expired link
         await linkRef.delete();
-        return res.status(410).send({
+        return res.status(200).send({
           data: {
             status: "error",
             message: "Link has expired and been deleted",

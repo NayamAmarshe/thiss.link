@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "firebase": "firebase emulators:start --import=./data --export-on-exit",
-    "dev": "(rm -rf functions/lib && cd functions/ && npm run build:watch & cd ..) && npm run firebase & next dev",
+    "dev": "npm run firebase & next dev &",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -32,8 +32,7 @@
     "faker": "^6.6.6",
     "faker-js": "^1.0.0",
     "firebase": "^11.2.0",
-    "firebase-admin": "^13.0.2",
-    "firebase-functions": "^6.3.0",
+    "firebase-functions": "^6.3.2",
     "jotai": "^2.10.3",
     "lucide-react": "^0.468.0",
     "monkey-typewriter": "^1.0.14",

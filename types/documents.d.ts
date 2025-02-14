@@ -16,6 +16,10 @@ export type UserDocument = {
     nextPaymentTime: Timestamp | null;
     planId: string;
   };
+  customLinksUsage?: {
+    count: number;
+    monthlyReset: Timestamp;
+  };
 };
 
 export type UserLinksDocument = {
