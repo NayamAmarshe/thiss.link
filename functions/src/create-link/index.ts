@@ -15,16 +15,14 @@ export type CreateLinkRequest = {
 };
 
 export type CreateLinkResponse = {
-  data: {
-    status: string;
-    message: string;
-    linkData?: LinkDocument;
-  };
+  status: string;
+  message: string;
+  linkData?: LinkDocument;
 };
 
 export const createLinkHandler = async (
   req: Request,
-  res: Response<CreateLinkResponse>,
+  res: Response,
   db: Firestore,
 ) => {
   console.log("🚀 => req.body:", req.body);
@@ -184,22 +182,20 @@ export const createLinkHandler = async (
     const isDev = process.env.NODE_ENV === "development";
 
     const responseData: CreateLinkResponse = {
-      data: {
-        status: "success",
-        message: "Link created successfully",
-        linkData: {
-          createdAt: Timestamp.fromDate(new Date()),
-          link: isDev
-            ? `http://localhost:3000/${slug}`
-            : `https://thiss.link/${slug}`,
-          slug,
-          expiresAt: expiresAt ? Timestamp.fromDate(expiresAt) : null,
-          isProtected,
-        },
+      status: "success",
+      message: "Link created successfully",
+      linkData: {
+        createdAt: Timestamp.fromDate(new Date()),
+        link: isDev
+          ? `http://localhost:3000/${slug}`
+          : `https://thiss.link/${slug}`,
+        slug,
+        expiresAt: expiresAt ? Timestamp.fromDate(expiresAt) : null,
+        isProtected,
       },
     };
 
-    res.status(201).send(responseData);
+    res.status(201).send({ data: responseData });
   } catch (error) {
     console.error(error);
     res.status(500).send({

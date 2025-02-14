@@ -38,12 +38,26 @@ export const createUser = functions.auth.user().onCreate(async (user) => {
   await createUserHandler(user, db);
 });
 
-export const getLink = functions.https.onRequest(async (req, res) => {
-  await getLinkHandler(req, res, db);
-});
+export const getLink = onRequest(
+  {
+    cors: true,
+    timeoutSeconds: 60,
+    region: ["us-central1"],
+  },
+  (request, response) => {
+    logger.info("getLink called!", { structuredData: true });
+    getLinkHandler(request, response, db);
+  },
+);
 
-export const verifySubscription = functions.https.onRequest(
+export const verifySubscription = onRequest(
+  {
+    cors: true,
+    timeoutSeconds: 60,
+    region: ["us-central1"],
+  },
   async (req, res) => {
+    console.log("verifySubscription called!");
     await verifySubscriptionHandler(req, res, db);
   },
 );

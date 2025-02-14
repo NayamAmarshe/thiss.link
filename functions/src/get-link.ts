@@ -15,30 +15,33 @@ export type GetLinkResponse = {
 
 export const getLinkHandler = async (
   req: Request,
-  res: Response<GetLinkResponse>,
+  res: Response,
   db: Firestore,
 ) => {
   try {
     const body: GetLinkRequest = req.body.data;
+    console.log("🚀 => body:", body);
     const { slug } = body;
 
     if (!slug) {
-      res.status(400).json({
-        status: "error",
-        message: "Slug is required",
+      return res.status(400).send({
+        data: {
+          status: "error",
+          message: "Slug is required",
+        },
       });
-      return;
     }
 
     const linkRef = db.collection("new-links").doc(slug);
     const linkDoc = await linkRef.get();
 
     if (!linkDoc.exists) {
-      res.status(404).json({
-        status: "error",
-        message: "Link not found",
+      return res.status(404).send({
+        data: {
+          status: "error",
+          message: "Link not found",
+        },
       });
-      return;
     }
 
     const linkData = linkDoc.data() as LinkDocument;
@@ -49,24 +52,29 @@ export const getLinkHandler = async (
       if (linkData.expiresAt.toDate().getTime() <= now) {
         // Delete expired link
         await linkRef.delete();
-        res.status(410).json({
-          status: "error",
-          message: "Link has expired and been deleted",
+        return res.status(410).send({
+          data: {
+            status: "error",
+            message: "Link has expired and been deleted",
+          },
         });
-        return;
       }
     }
 
-    res.status(200).json({
-      status: "success",
-      message: "Link found",
-      linkData,
+    return res.status(200).send({
+      data: {
+        status: "success",
+        message: "Link found",
+        linkData,
+      },
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      status: "error",
-      message: "Something went wrong, please try again",
+    return res.status(500).send({
+      data: {
+        status: "error",
+        message: "Something went wrong, please try again",
+      },
     });
   }
 };
