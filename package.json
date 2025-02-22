@@ -2,7 +2,7 @@
   "name": "thiss.link",
   "private": true,
   "scripts": {
-    "firebase": "firebase emulators:start --import=./data --export-on-exit",
+    "firebase": "(cd functions/ && npm run dev & cd ..) && firebase emulators:start --import=./data --export-on-exit",
     "dev": "NODE_ENV=\"development\" npm run firebase & next dev &",
     "build": "next build",
     "start": "next start",

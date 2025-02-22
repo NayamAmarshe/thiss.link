@@ -124,7 +124,8 @@ const LinkOptionsDialog = ({
         <div className="flex w-full flex-col gap-4">
           <div className="flex flex-col items-start gap-2">
             <Label htmlFor="name" className="text-right">
-              Custom Link ({userDocument?.customLinksUsage?.count}/5 used)
+              Custom Link
+              {` (${userDocument?.customLinksUsage?.count ?? 0}/5 used)`}
             </Label>
             <div className="relative flex w-full items-center">
               <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-sm text-text text-opacity-50 dark:text-darkText">
