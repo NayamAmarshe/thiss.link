@@ -12,7 +12,7 @@ import {
 import {
   VerifySubscriptionRequest,
   VerifySubscriptionResponse,
-} from "@/functions/src/verify-subscription";
+} from "@/functions/src/handlers/verify-subscription";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "@/lib/firebase/firebase";
 

@@ -1,5 +1,5 @@
 import { Firestore, Timestamp } from "firebase-admin/firestore";
-import { UserDocument } from "../../types/documents";
+import { UserDocument } from "../../../types/documents";
 import { HttpsError, UserRecord } from "firebase-functions/v1/auth";
 import * as logger from "firebase-functions/logger";
 

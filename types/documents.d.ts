@@ -2,6 +2,7 @@ import { Timestamp } from "@google-cloud/firestore";
 
 export type UserDocument = {
   uid: string;
+  admin?: string;
   email: string;
   photoURL: string | undefined;
   name: string;

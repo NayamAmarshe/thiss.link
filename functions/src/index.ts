@@ -10,10 +10,10 @@ import * as admin from "firebase-admin";
 import * as functions from "firebase-functions/v1";
 import { onRequest } from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
-import { createLinkHandler } from "./create-link";
-import { createUserHandler } from "./create-user";
-import { getLinkHandler } from "./get-link";
-import { verifySubscriptionHandler } from "./verify-subscription";
+import { createUserHandler } from "./handlers/create-user";
+import { getLinkHandler } from "./handlers/get-link";
+import { verifySubscriptionHandler } from "./handlers/verify-subscription";
+import { createLinkHandler } from "./handlers/create-link";
 
 admin.initializeApp();
 const db = admin.firestore();

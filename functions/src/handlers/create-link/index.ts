@@ -1,10 +1,10 @@
 import { Firestore, Timestamp } from "firebase-admin/firestore";
-import { LinkDocument, UserDocument } from "../../../types/documents";
 import { Request } from "firebase-functions/https";
 import { Response } from "express";
 import { encryptUrl } from "./encrypt-url";
-import { googleSafeBrowsingCheck } from "../safe-browsing";
+import { googleSafeBrowsingCheck } from "./safe-browsing";
 import Monkey from "monkey-typewriter";
+import { LinkDocument, UserDocument } from "../../../../types/documents";
 
 export type CreateLinkRequest = {
   slug: string;

@@ -11,7 +11,10 @@ import { LinkDocument } from "@/types/documents";
 import { useRouter } from "next/navigation";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "../../lib/firebase/firebase";
-import { GetLinkRequest, GetLinkResponse } from "../../functions/src/get-link";
+import {
+  GetLinkRequest,
+  GetLinkResponse,
+} from "../../functions/src/handlers/get-link";
 
 const SlugPage = ({ params }: { params: { slug: string } }) => {
   const router = useRouter();

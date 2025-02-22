@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { Request } from "firebase-functions/https";
 import { Firestore } from "firebase-admin/firestore";
-import { LinkDocument } from "../../types/documents";
+import { LinkDocument } from "../../../types/documents";
 
 export type GetLinkRequest = {
   slug: string;

@@ -28,16 +28,17 @@ export default function Faq() {
             <AccordionItem className="mb-2" value="item-2">
               <AccordionTrigger>Why should I use this?</AccordionTrigger>
               <AccordionContent>
-                1. MagLit keeps everything encrypted. This means nobody except
-                you has access to your links when you use your own password.
+                1. thiss.link keeps everything encrypted. This means nobody
+                except you has access to your links when you use your own
+                password.
                 <br />
                 <br />
-                2. MagLit lets you password protect your links and also lets you
-                use custom links. All without any sign-up or account
+                2. thiss.link lets you password protect your links and also lets
+                you use custom links. All without any sign-up or account
                 registration.
                 <br />
                 <br />
-                3. MagLit protects your privacy. 100% free and open source,
+                3. thiss.link protects your privacy. 100% free and open source,
                 verifiable website deployments. No data mining, no data selling.
               </AccordionContent>
             </AccordionItem>

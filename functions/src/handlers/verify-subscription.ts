@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
 import { Request } from "firebase-functions/https";
-import { generateAccessToken } from "./generate-acces-token";
+import { generateAccessToken } from "./paypal/generate-acces-token";
 import { Response } from "express";
 import { Firestore } from "firebase-admin/firestore";
 
