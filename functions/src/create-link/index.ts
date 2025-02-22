@@ -40,6 +40,8 @@ export const createLinkHandler = async (
     let slug = providedSlug || "";
     let expiry = providedExpiry;
 
+    let userData: UserDocument | null = null;
+
     // If user is not logged in, disable premium features
     if (!userId) {
       expiry = undefined;
@@ -47,20 +49,17 @@ export const createLinkHandler = async (
     } else {
       // Check subscription status for logged-in users
       const userDoc = await db.collection("users").doc(userId).get();
-      const userData = userDoc.data() as UserDocument;
-      const hasActiveSubscription = userData?.subscription?.status === "ACTIVE";
+      userData = userDoc.data() as UserDocument;
 
       // If no active subscription, check custom link limits and update usage
-      if (!hasActiveSubscription) {
+      if (!userData.isSubscribed) {
         expiry = undefined;
-
         // Initialize or check monthly usage
         const now = new Date();
         const currentUsage = userData.customLinksUsage || {
           count: 0,
           monthlyReset: Timestamp.fromDate(now),
         };
-
         // Reset counter if we're in a new month
         if (now.getTime() > currentUsage.monthlyReset.toDate().getTime()) {
           currentUsage.count = 0;
@@ -68,7 +67,6 @@ export const createLinkHandler = async (
             new Date(now.getFullYear(), now.getMonth() + 1, 1),
           );
         }
-
         // Check if user has reached monthly limit
         if (slug.length && currentUsage.count >= 5) {
           return res.status(200).send({
@@ -79,7 +77,6 @@ export const createLinkHandler = async (
             },
           });
         }
-
         // Store current usage for later update after successful creation
         userData.customLinksUsage = currentUsage;
       }
@@ -214,10 +211,12 @@ export const createLinkHandler = async (
       );
 
       // Only increment usage after successful creation for non-premium users
-      const userData = (
-        await db.collection("users").doc(userId).get()
-      ).data() as UserDocument;
-      if (userData?.customLinksUsage && !userData?.subscription?.status) {
+      // Check subscription status for logged-in users
+      if (
+        providedSlug &&
+        userData?.customLinksUsage &&
+        !userData?.isSubscribed
+      ) {
         batch.update(db.collection("users").doc(userId), {
           customLinksUsage: {
             count: userData.customLinksUsage.count + 1,

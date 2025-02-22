@@ -7,6 +7,7 @@ export type UserDocument = {
   name: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
+  isSubscribed: boolean;
   subscription?: {
     planDuration?: "monthly" | "yearly";
     subscriptionId: string;

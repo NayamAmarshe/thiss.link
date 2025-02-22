@@ -45,12 +45,18 @@ const LinkOptionsDialog = ({
   const [linkExpiry, setLinkExpiry] = useAtom(linkExpiryAtom);
   const [downloadQrCode, setDownloadQrCode] = useAtom(downloadQrCodeAtom);
   const [error, setError] = useState<string | null>(null);
-  const { isLoggedIn, user, userDocument } = useUser();
+  const { isLoggedIn, userDocument } = useUser();
   const { toast } = useToast();
 
   const hasActiveSubscription = userDocument?.subscription?.status === "ACTIVE";
 
   const canUseCustomLinks = (userDocument?.customLinksUsage?.count || 0) < 5;
+
+  useEffect(() => {
+    if (!canUseCustomLinks) {
+      setSlug("");
+    }
+  }, [canUseCustomLinks]);
 
   const checkSlug = useCallback(() => {
     console.log("Checking slug");
@@ -99,12 +105,18 @@ const LinkOptionsDialog = ({
           <DialogTitle>Link Options</DialogTitle>
           <DialogDescription>
             Customize your link with these options.
-            {isLoggedIn && !hasActiveSubscription && (
+            {!isLoggedIn && (
               <div className="bg-muted mt-2 flex items-center gap-1 rounded-md bg-main p-2 text-sm">
+                <StarIcon className="h-4 w-4" />
+                Sign in to use custom links and link expiry features.
+              </div>
+            )}
+            {isLoggedIn && !hasActiveSubscription && (
+              <div className="bg-muted mt-2 flex items-center gap-1 text-balance rounded-md bg-main p-2 text-sm">
                 <StarIcon className="h-4 w-4" />
                 {canUseCustomLinks
                   ? "Upgrade to set link expiry."
-                  : "Upgrade to use custom links and link expiry features."}
+                  : "Upgrade to use unlimited custom links and link expiry features."}
               </div>
             )}
           </DialogDescription>
@@ -112,7 +124,7 @@ const LinkOptionsDialog = ({
         <div className="flex w-full flex-col gap-4">
           <div className="flex flex-col items-start gap-2">
             <Label htmlFor="name" className="text-right">
-              Custom Link
+              Custom Link ({userDocument?.customLinksUsage?.count}/5 used)
             </Label>
             <div className="relative flex w-full items-center">
               <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-sm text-text text-opacity-50 dark:text-darkText">
