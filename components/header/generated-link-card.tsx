@@ -3,10 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
 import { popInAnimation } from "@/lib/motion";
-import Link from "next/link";
 import { LinkDocument } from "@/types/documents";
 import { FaClipboard, FaLink, FaList } from "react-icons/fa";
 import { toast } from "sonner";
+import LinkHistorySheet from "../link-history-sheet";
 
 const GeneratedLinkCard = ({
   generatedLink,
@@ -28,7 +28,7 @@ const GeneratedLinkCard = ({
           <span className="max-w-48 truncate">{generatedLink.link}</span>
         </Button>
       </a>
-      <Link href={`/links`}>
+      <LinkHistorySheet>
         <Button
           size="sm"
           type="button"
@@ -41,7 +41,7 @@ const GeneratedLinkCard = ({
           <FaList className="mr-2" />
           My Links
         </Button>
-      </Link>
+      </LinkHistorySheet>
       <Button
         size="sm"
         type="button"

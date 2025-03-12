@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FaLock, FaSpinner, FaUnlock } from "react-icons/fa";
+import { FaLock, FaSpinner, FaUnlock, FaList } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "motion/react";
 import { popInAnimation } from "@/lib/motion";
@@ -18,6 +18,7 @@ import {
   CreateLinkResponse,
 } from "../functions/src/handlers/create-link";
 import { toast } from "sonner";
+import LinkHistorySheet from "./link-history-sheet";
 
 const LinkForm = ({
   creatingLink,
@@ -87,7 +88,7 @@ const LinkForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-[900px]">
+    <form onSubmit={handleSubmit} className="w-full">
       <motion.div
         className="flex w-full flex-col gap-3"
         variants={popInAnimation}
@@ -128,7 +129,7 @@ const LinkForm = ({
             >
               <Input
                 type="password"
-                className="h-12 text-base font-heading md:text-lg lg:h-14 lg:text-xl"
+                className="h-12 w-full text-base font-heading md:text-lg lg:h-14 lg:text-xl"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password here..."
@@ -164,6 +165,17 @@ const LinkForm = ({
           >
             {isLocked ? <FaLock /> : <FaUnlock />}
           </Button>
+
+          <LinkHistorySheet>
+            <Button
+              size="lg"
+              type="button"
+              className="h-12 text-base font-heading dark:text-text md:text-lg lg:h-14 lg:text-xl"
+              variant="neutral"
+            >
+              <FaList />
+            </Button>
+          </LinkHistorySheet>
         </motion.div>
 
         <GeneratedLinkCard generatedLink={generatedLink} />

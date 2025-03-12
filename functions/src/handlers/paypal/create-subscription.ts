@@ -2,8 +2,8 @@ import { logger, Response } from "firebase-functions/v1";
 import { generateAccessToken } from "./generate-acces-token";
 import { Firestore } from "firebase-admin/firestore";
 import { Request } from "firebase-functions/https";
-import { checkAuth } from "src/lib/check-auth";
 import { UserDocument } from "../../../../types/documents";
+import { checkAuth } from "../../lib/check-auth";
 
 const base = process.env.PAYPAL_BASE_URL;
 
