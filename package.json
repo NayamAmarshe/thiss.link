@@ -2,7 +2,7 @@
   "name": "thiss.link",
   "private": true,
   "scripts": {
-    "firebase": "(cd functions/ && npm run dev & cd ..) && firebase emulators:start --import=./data --export-on-exit",
+    "firebase": "(cd functions/ && npm run dev & cd ..)",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -31,7 +31,7 @@
     "express": "^4.21.2",
     "faker": "^6.6.6",
     "faker-js": "^1.0.0",
-    "firebase": "^11.2.0",
+    "firebase": "^11.4.0",
     "jotai": "^2.10.3",
     "lucide-react": "^0.468.0",
     "monkey-typewriter": "^1.0.14",
@@ -44,6 +44,7 @@
     "react-fast-marquee": "^1.6.5",
     "react-icons": "^5.4.0",
     "react-toastify": "^10.0.6",
+    "sonner": "^2.0.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7"
   },

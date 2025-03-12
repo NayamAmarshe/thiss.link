@@ -3,8 +3,8 @@
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
     "build": "tsc",
-    "build:watch": "tsc --watch",
-    "dev": "rm -rf functions/lib && NODE_ENV=development npm run build:watch & firebase emulators:start --import=./data --export-on-exit",
+    "build:watch": "tsc --watch --preserveWatchOutput",
+    "dev": "NODE_ENV=development npm run build:watch --preserve & firebase emulators:start --import=./data --export-on-exit",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",

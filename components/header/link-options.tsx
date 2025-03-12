@@ -1,6 +1,4 @@
-import { useToast } from "@/hooks/use-toast";
 import useUser from "@/hooks/use-user";
-import { User } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import { FaSave, FaWrench } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
@@ -30,8 +28,8 @@ import {
   linkExpiryAtom,
 } from "../../atoms/user-settings";
 import { useCallback, useEffect, useState } from "react";
-import { ToastAction } from "../ui/toast";
 import { StarIcon } from "lucide-react";
+import { toast } from "sonner";
 
 // Extend the Firebase User type
 
@@ -46,7 +44,6 @@ const LinkOptionsDialog = ({
   const [downloadQrCode, setDownloadQrCode] = useAtom(downloadQrCodeAtom);
   const [error, setError] = useState<string | null>(null);
   const { isLoggedIn, userDocument } = useUser();
-  const { toast } = useToast();
 
   const hasActiveSubscription = userDocument?.subscription?.status === "ACTIVE";
 
@@ -158,12 +155,9 @@ const LinkOptionsDialog = ({
                 checked={!!linkExpiry}
                 onCheckedChange={(checked) => {
                   if (!hasActiveSubscription && checked) {
-                    toast({
-                      title: "Premium Feature",
-                      description:
-                        "Link expiry is only available with a subscription",
-                      variant: "default",
-                    });
+                    toast.error(
+                      "Link expiry is only available with a subscription",
+                    );
                     return;
                   }
                   setLinkExpiry(checked ? "24-hours" : undefined);
@@ -195,11 +189,7 @@ const LinkOptionsDialog = ({
               onClick={(e) => {
                 checkSlug();
                 if (error) {
-                  toast({
-                    title: "Error",
-                    description: error,
-                    action: <ToastAction altText="Got it">Got it</ToastAction>,
-                  });
+                  toast.error(error);
                   e.preventDefault();
                 }
               }}

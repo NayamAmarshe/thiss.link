@@ -4,8 +4,6 @@ import { FaLock, FaSpinner, FaUnlock } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "motion/react";
 import { popInAnimation } from "@/lib/motion";
-import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "./ui/toast";
 import { cn } from "@/lib/utils";
 import LinkOptionsDialog from "./header/link-options";
 import { useAtom, useAtomValue } from "jotai";
@@ -18,7 +16,8 @@ import { functions } from "../lib/firebase/firebase";
 import {
   CreateLinkRequest,
   CreateLinkResponse,
-} from "../functions/src/create-link";
+} from "../functions/src/handlers/create-link";
+import { toast } from "sonner";
 
 const LinkForm = ({
   creatingLink,
@@ -31,7 +30,6 @@ const LinkForm = ({
 
   const [url, setUrl] = useState("");
   const [slug, setSlug] = useState("");
-  const { toast } = useToast();
   const [password, setPassword] = useState("");
   const [isLocked, setIsLocked] = useState(false);
   const linkExpiry = useAtomValue(linkExpiryAtom);
@@ -44,11 +42,10 @@ const LinkForm = ({
 
     const urlRegex = /^(https?:\/\/|ftp:\/\/|magnet:\?).+/i;
     if (!urlRegex.test(url)) {
-      toast({
-        title: "Invalid URL",
+      toast.error("Invalid URL", {
         description:
           "URL must start with http://, https://, ftp://, or magnet:?",
-        action: <ToastAction altText="Got it">Got it</ToastAction>,
+        action: <Button>Got it</Button>,
       });
       return;
     }
@@ -68,28 +65,21 @@ const LinkForm = ({
       console.log("🚀 => handleSubmit => responseData:", responseData);
 
       if (responseData.data.status === "error") {
-        toast({
-          title: "Error",
-          description: responseData.data.message,
-          variant: "destructive",
-        });
+        toast.error(responseData.data.message);
         return;
       }
 
       if (responseData.data.linkData) {
-        toast({
-          title: "Success",
+        toast.success("Success", {
           description: "thiss link has been copied to clipboard",
-          action: <ToastAction altText="Got it">Got it</ToastAction>,
         });
         setGeneratedLinks((prev) => [...prev, responseData.data.linkData!]);
         setGeneratedLink(responseData.data.linkData);
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        action: <ToastAction altText="Got it">Got it</ToastAction>,
+      console.error("🚀 => handleSubmit => error:", error);
+      toast.error(error.message, {
+        action: <Button>Got it</Button>,
       });
     } finally {
       setCreatingLink(false);

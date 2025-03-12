@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { useToast } from "./use-toast";
 import {
   DISPATCH_ACTION,
   usePayPalScriptReducer,
@@ -15,11 +14,11 @@ import {
 } from "@/functions/src/handlers/verify-subscription";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "@/lib/firebase/firebase";
+import { toast } from "sonner";
 
 export const usePayPalSubscription = (planId: string) => {
   const [{ isResolved, isPending }, paypalDispatch] = usePayPalScriptReducer();
   const { isLoggedIn, user, handleLogin, userLoading } = useUser();
-  const { toast } = useToast();
 
   useEffect(() => {
     paypalDispatch({
@@ -38,11 +37,7 @@ export const usePayPalSubscription = (planId: string) => {
     actions,
   ) => {
     if (!planId) {
-      toast({
-        title: "Error",
-        description: "Please select a plan to subscribe",
-        variant: "destructive",
-      });
+      toast.error("Please select a plan to subscribe");
       return "No plan found";
     }
     return actions.subscription.create({
@@ -55,20 +50,12 @@ export const usePayPalSubscription = (planId: string) => {
     actions,
   ) => {
     if (!isLoggedIn || !user) {
-      toast({
-        title: "Error",
-        description: "Please sign in to subscribe",
-        variant: "destructive",
-      });
+      toast.error("Please sign in to subscribe");
       return;
     }
 
     if (!data.subscriptionID) {
-      toast({
-        title: "Error",
-        description: "Subscription ID not found",
-        variant: "destructive",
-      });
+      toast.error("Subscription ID not found");
       return;
     }
 
@@ -84,25 +71,14 @@ export const usePayPalSubscription = (planId: string) => {
       });
 
       if (responseData.data.status === "error") {
-        toast({
-          title: "Error",
-          description: responseData.data.message,
-          variant: "destructive",
-        });
+        toast.error(responseData.data.message);
         return;
       }
 
-      toast({
-        title: "Success",
-        description: "Your subscription has been activated!",
-      });
+      toast.success("Your subscription has been activated!");
     } catch (error) {
       console.error("Error updating subscription:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update subscription. Please contact support.",
-        variant: "destructive",
-      });
+      toast.error("Failed to update subscription. Please contact support.");
     }
   };
 

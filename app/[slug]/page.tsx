@@ -1,8 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { toast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
 import Head from "next/head";
 import Navbar from "@/components/navbar";
 import Header from "@/components/sections/header";
@@ -15,6 +13,7 @@ import {
   GetLinkRequest,
   GetLinkResponse,
 } from "../../functions/src/handlers/get-link";
+import { toast } from "sonner";
 
 const SlugPage = ({ params }: { params: { slug: string } }) => {
   const router = useRouter();
@@ -49,11 +48,7 @@ const SlugPage = ({ params }: { params: { slug: string } }) => {
       }
     } catch (error) {
       router.push("/");
-      toast({
-        title: "Error",
-        description: "Error fetching link",
-        action: <ToastAction altText="Got it">Got it</ToastAction>,
-      });
+      toast.error("Error fetching link");
     }
   }, [params.slug, router]);
 
