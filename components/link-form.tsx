@@ -95,10 +95,7 @@ const LinkForm = ({
         initial="hidden"
         animate="visible"
       >
-        <motion.div
-          className="z-10 flex w-full gap-2"
-          variants={popInAnimation}
-        >
+        <motion.div className="z-10 w-full" variants={popInAnimation}>
           <Input
             className="h-12 w-full text-base font-heading md:text-lg lg:h-14 lg:text-xl"
             type="url"
@@ -126,6 +123,7 @@ const LinkForm = ({
                   duration: 0.2,
                 },
               }}
+              className="w-full"
             >
               <Input
                 type="password"
@@ -139,7 +137,10 @@ const LinkForm = ({
           )}
         </AnimatePresence>
 
-        <motion.div variants={popInAnimation} className="z-10 flex gap-2">
+        <motion.div
+          variants={popInAnimation}
+          className="z-10 flex w-full flex-col gap-2 sm:flex-row"
+        >
           <Button
             type="submit"
             className={cn(
@@ -154,28 +155,30 @@ const LinkForm = ({
             {!creatingLink ? "(ツ) squish thiss link" : "squishing"}
           </Button>
 
-          <LinkOptionsDialog slug={slug} setSlug={setSlug} />
-
-          <Button
-            size="lg"
-            type="button"
-            className="h-12 text-base font-heading dark:text-text md:text-lg lg:h-14 lg:text-xl"
-            variant={isLocked ? "default" : "neutral"}
-            onClick={() => setIsLocked(!isLocked)}
-          >
-            {isLocked ? <FaLock /> : <FaUnlock />}
-          </Button>
-
-          <LinkHistorySheet>
+          <div className="flex items-center justify-between gap-2">
             <Button
               size="lg"
               type="button"
-              className="h-12 text-base font-heading dark:text-text md:text-lg lg:h-14 lg:text-xl"
-              variant="neutral"
+              className="h-12 w-full text-base font-heading dark:text-text md:text-lg lg:h-14 lg:text-xl"
+              variant={isLocked ? "default" : "neutral"}
+              onClick={() => setIsLocked(!isLocked)}
             >
-              <FaList />
+              {isLocked ? <FaLock /> : <FaUnlock />}
             </Button>
-          </LinkHistorySheet>
+
+            <LinkOptionsDialog slug={slug} setSlug={setSlug} />
+
+            <LinkHistorySheet>
+              <Button
+                size="lg"
+                type="button"
+                className="h-12 w-full text-base font-heading dark:text-text md:text-lg lg:h-14 lg:text-xl"
+                variant="neutral"
+              >
+                <FaList />
+              </Button>
+            </LinkHistorySheet>
+          </div>
         </motion.div>
 
         <GeneratedLinkCard generatedLink={generatedLink} />

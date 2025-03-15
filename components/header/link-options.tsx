@@ -92,7 +92,7 @@ const LinkOptionsDialog = ({
           size="lg"
           type="button"
           variant="neutral"
-          className="h-12 text-base font-heading md:text-lg lg:h-14 lg:text-xl"
+          className="h-12 w-full text-base font-heading md:text-lg lg:h-14 lg:text-xl"
         >
           <FaWrench />
         </Button>
@@ -137,7 +137,7 @@ const LinkOptionsDialog = ({
             </div>
           </div>
 
-          <div className="flex flex-col items-start gap-2">
+          {/* <div className="flex flex-col items-start gap-2">
             <Label htmlFor="download-qr-code">Download QR Code</Label>
             <Switch
               id="download-qr-code"
@@ -145,7 +145,7 @@ const LinkOptionsDialog = ({
               disabled={!isLoggedIn}
               onCheckedChange={(checked) => setDownloadQrCode(checked)}
             />
-          </div>
+          </div> */}
 
           <div className="flex flex-col items-start gap-2">
             <Label htmlFor="download-qr-code">Link Expiration</Label>

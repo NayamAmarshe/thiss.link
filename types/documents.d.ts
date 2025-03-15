@@ -24,12 +24,6 @@ export type UserDocument = {
   };
 };
 
-export type UserLinksDocument = {
-  createdAt: string;
-  expiresAt?: string;
-  slug: string;
-};
-
 export type LinkDocument = {
   link: string;
   slug: string;

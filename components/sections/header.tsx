@@ -25,7 +25,7 @@ export default function Header({
       )}
     >
       {/* Content */}
-      <motion.div className="relative z-10 flex max-w-[500px] flex-col items-center justify-center gap-6 text-center">
+      <motion.div className="relative z-10 flex max-w-fit flex-col items-center justify-center gap-6 text-center">
         <motion.div
           className="flex flex-col items-center justify-center gap-2"
           variants={popInAnimation}
@@ -37,7 +37,7 @@ export default function Header({
               src="/logo.svg"
               alt="logo"
               className={cn(
-                "w-full transition-transform duration-500 ease-in-out dark:opacity-95 dark:invert",
+                "mx-auto w-full max-w-[300px] transition-transform duration-500 ease-in-out dark:opacity-95 dark:invert sm:max-w-[400px]",
                 creatingLink && "scale-95",
               )}
             />
@@ -45,7 +45,7 @@ export default function Header({
           <motion.span className="inline-block -rotate-1 bg-mainAccent px-2">
             <motion.p
               className={cn(
-                "rotate-1 text-lg font-bold leading-relaxed transition-opacity duration-500 dark:text-mainAccent md:text-xl lg:text-2xl lg:leading-relaxed",
+                "rotate-1 text-lg font-bold leading-relaxed transition-opacity duration-500 dark:text-mainAccent sm:text-xl lg:text-2xl lg:leading-relaxed",
               )}
             >
               Free and Open Source Link Shortener

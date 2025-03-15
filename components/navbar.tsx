@@ -6,6 +6,8 @@ import { signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { Button } from "./ui/button";
 import useUser from "../hooks/use-user";
+import LinkHistorySheet from "./link-history-sheet";
+import { FaList } from "react-icons/fa";
 
 const Navbar = () => {
   const { isLoggedIn, user, handleLogin, userLoading } = useUser();
@@ -30,13 +32,17 @@ const Navbar = () => {
           </Link>
         </div>
         <div className="flex items-center gap-4">
+          <LinkHistorySheet>
+            <Button className="bg-destructive text-destructive-foreground hover:bg-destructive/90 animate gap-2 rounded-lg px-2 py-2 transition-colors !duration-200">
+              <FaList /> My Links
+            </Button>
+          </LinkHistorySheet>
           {isLoggedIn ? (
             <div className="flex items-center gap-4">
               <Button
                 onClick={handleLogout}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90 animate gap-2 rounded-lg px-2 py-2 transition-colors !duration-200"
               >
-                Sign Out
                 {user?.photoURL && (
                   <img
                     referrerPolicy="no-referrer"
@@ -45,6 +51,7 @@ const Navbar = () => {
                     className="h-6 w-6 rounded-full"
                   />
                 )}
+                Sign Out
               </Button>
             </div>
           ) : (
