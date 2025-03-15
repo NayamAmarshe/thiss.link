@@ -1,12 +1,14 @@
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from "@google-cloud/firestore";
 
 export type UserDocument = {
   uid: string;
+  admin?: string;
   email: string;
   photoURL: string | undefined;
   name: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  isSubscribed?: boolean;
   subscription?: {
     planDuration?: "monthly" | "yearly";
     subscriptionId: string;
@@ -16,19 +18,17 @@ export type UserDocument = {
     nextPaymentTime: Timestamp | null;
     planId: string;
   };
-};
-
-export type UserLinksDocument = {
-  createdAt: string;
-  expiresAt?: string;
-  slug: string;
+  customLinksUsage?: {
+    count: number;
+    monthlyReset: Timestamp;
+  };
 };
 
 export type LinkDocument = {
   link: string;
   slug: string;
-  createdAt: Timestamp | number | null;
+  createdAt: Timestamp | null;
   ip?: string;
   isProtected?: boolean;
-  expiresAt?: Timestamp | number | null;
+  expiresAt?: Timestamp | null;
 };

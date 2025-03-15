@@ -1,41 +1,45 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { toast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
+import { useCallback, useEffect, useState } from "react";
 import Head from "next/head";
 import Navbar from "@/components/navbar";
 import Header from "@/components/sections/header";
 import Footer from "@/components/footer";
 import { LinkDocument } from "@/types/documents";
 import { useRouter } from "next/navigation";
-import { GetLinkRequest, GetLinkResponse } from "../api/get-link/route";
-
-export const dynamic = "force-dynamic";
+import { httpsCallable } from "firebase/functions";
+import { functions } from "../../lib/firebase/firebase";
+import {
+  GetLinkRequest,
+  GetLinkResponse,
+} from "../../functions/src/handlers/get-link";
+import { toast } from "sonner";
 
 const SlugPage = ({ params }: { params: { slug: string } }) => {
   const router = useRouter();
 
   const [linkData, setLinkData] = useState<LinkDocument | null>(null);
 
-  const fetchLink = async () => {
-    if (!params.slug) return;
+  const fetchLink = useCallback(async () => {
+    if (!params.slug) {
+      console.error("Slug is required");
+      return;
+    }
     try {
-      const response = await fetch("/api/get-link", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          slug: params.slug,
-        } as GetLinkRequest),
-      });
-      const responseData: GetLinkResponse = await response.json();
-      if (responseData.status === "error" || !response.ok) {
+      const getLink = httpsCallable<GetLinkRequest, GetLinkResponse>(
+        functions,
+        "getLink",
+      );
+      const response = await getLink({ slug: params.slug });
+      const responseData = response.data;
+      console.log("🚀 => fetchLink => responseData:", responseData);
+      if (!responseData) {
+        throw new Error("Error fetching link");
+      }
+      if (responseData.status === "error") {
         throw new Error(responseData.message);
       }
       if (responseData.status === "success" && responseData.linkData) {
-        console.log("🚀 => responseData:", responseData);
         if (!responseData.linkData.isProtected) {
           router.push(responseData.linkData.link);
         } else {
@@ -44,18 +48,14 @@ const SlugPage = ({ params }: { params: { slug: string } }) => {
       }
     } catch (error) {
       router.push("/");
-      toast({
-        title: "Error",
-        description: "Error fetching link",
-        action: <ToastAction altText="Got it">Got it</ToastAction>,
-      });
+      toast.error("Error fetching link");
     }
-  };
+  }, [params.slug, router]);
 
   useEffect(() => {
     if (!params.slug) return;
     fetchLink();
-  }, [params.slug]);
+  }, [fetchLink, params.slug]);
 
   if (!params.slug || !linkData) {
     return null;

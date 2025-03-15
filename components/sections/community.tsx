@@ -60,7 +60,7 @@ export default function Community() {
             </p>
           )}
         </div>
-        <div className="w900:grid-cols-1 w900:gap-0 grid grid-cols-3 gap-4 lg:gap-8">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-8">
           {[[review[0], review[1]], [review[2]], [review[3], review[4]]].map(
             (card, index) => (
               <div className="group flex flex-col justify-center" key={index}>

@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FaLock, FaSpinner, FaUnlock } from "react-icons/fa";
+import { FaLock, FaSpinner, FaUnlock, FaList } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "motion/react";
 import { popInAnimation } from "@/lib/motion";
-import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "./ui/toast";
 import { cn } from "@/lib/utils";
 import LinkOptionsDialog from "./header/link-options";
 import { useAtom, useAtomValue } from "jotai";
@@ -13,10 +11,14 @@ import { generatedLinksAtom, linkExpiryAtom } from "../atoms/user-settings";
 import useUser from "../hooks/use-user";
 import { LinkDocument } from "@/types/documents";
 import GeneratedLinkCard from "./header/generated-link-card";
+import { httpsCallable } from "firebase/functions";
+import { functions } from "../lib/firebase/firebase";
 import {
   CreateLinkRequest,
   CreateLinkResponse,
-} from "@/app/api/create-link/route";
+} from "../functions/src/handlers/create-link";
+import { toast } from "sonner";
+import LinkHistorySheet from "./link-history-sheet";
 
 const LinkForm = ({
   creatingLink,
@@ -29,7 +31,6 @@ const LinkForm = ({
 
   const [url, setUrl] = useState("");
   const [slug, setSlug] = useState("");
-  const { toast } = useToast();
   const [password, setPassword] = useState("");
   const [isLocked, setIsLocked] = useState(false);
   const linkExpiry = useAtomValue(linkExpiryAtom);
@@ -42,49 +43,44 @@ const LinkForm = ({
 
     const urlRegex = /^(https?:\/\/|ftp:\/\/|magnet:\?).+/i;
     if (!urlRegex.test(url)) {
-      toast({
-        title: "Invalid URL",
+      toast.error("Invalid URL", {
         description:
           "URL must start with http://, https://, ftp://, or magnet:?",
-        action: <ToastAction altText="Got it">Got it</ToastAction>,
+        action: <Button>Got it</Button>,
       });
       return;
     }
 
     try {
-      const response = await fetch("/api/create-link", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          url,
-          password,
-          userId: user?.uid,
-          slug: slug,
-          expiry: linkExpiry,
-        } as CreateLinkRequest),
-      });
-      const responseData: CreateLinkResponse = await response.json();
-      console.log("🚀 => responseData:", responseData);
-      if (responseData.status === "error" || !response.ok) {
-        throw new Error(responseData.message);
+      const createLink = httpsCallable<CreateLinkRequest, CreateLinkResponse>(
+        functions,
+        "createLink",
+      );
+      const responseData = await createLink({
+        url,
+        password,
+        userId: user?.uid,
+        slug,
+        expiry: linkExpiry,
+      } as CreateLinkRequest);
+      console.log("🚀 => handleSubmit => responseData:", responseData);
+
+      if (responseData.data.status === "error") {
+        toast.error(responseData.data.message);
+        return;
       }
 
-      if (responseData.linkData) {
-        toast({
-          title: "Success",
+      if (responseData.data.linkData) {
+        toast.success("Success", {
           description: "thiss link has been copied to clipboard",
-          action: <ToastAction altText="Got it">Got it</ToastAction>,
         });
-        setGeneratedLinks((prev) => [...prev, responseData.linkData!]);
-        setGeneratedLink(responseData.linkData);
+        setGeneratedLinks((prev) => [...prev, responseData.data.linkData!]);
+        setGeneratedLink(responseData.data.linkData);
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Error creating link",
-        action: <ToastAction altText="Got it">Got it</ToastAction>,
+      console.error("🚀 => handleSubmit => error:", error);
+      toast.error(error.message, {
+        action: <Button>Got it</Button>,
       });
     } finally {
       setCreatingLink(false);
@@ -92,17 +88,14 @@ const LinkForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-[900px]">
+    <form onSubmit={handleSubmit} className="w-full">
       <motion.div
         className="flex w-full flex-col gap-3"
         variants={popInAnimation}
         initial="hidden"
         animate="visible"
       >
-        <motion.div
-          className="z-10 flex w-full gap-2"
-          variants={popInAnimation}
-        >
+        <motion.div className="z-10 w-full" variants={popInAnimation}>
           <Input
             className="h-12 w-full text-base font-heading md:text-lg lg:h-14 lg:text-xl"
             type="url"
@@ -130,10 +123,11 @@ const LinkForm = ({
                   duration: 0.2,
                 },
               }}
+              className="w-full"
             >
               <Input
                 type="password"
-                className="h-12 text-base font-heading md:text-lg lg:h-14 lg:text-xl"
+                className="h-12 w-full text-base font-heading md:text-lg lg:h-14 lg:text-xl"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password here..."
@@ -143,7 +137,10 @@ const LinkForm = ({
           )}
         </AnimatePresence>
 
-        <motion.div variants={popInAnimation} className="z-10 flex gap-2">
+        <motion.div
+          variants={popInAnimation}
+          className="z-10 flex w-full flex-col gap-2 sm:flex-row"
+        >
           <Button
             type="submit"
             className={cn(
@@ -158,17 +155,30 @@ const LinkForm = ({
             {!creatingLink ? "(ツ) squish thiss link" : "squishing"}
           </Button>
 
-          <LinkOptionsDialog slug={slug} setSlug={setSlug} />
+          <div className="flex items-center justify-between gap-2">
+            <Button
+              size="lg"
+              type="button"
+              className="h-12 w-full text-base font-heading dark:text-text md:text-lg lg:h-14 lg:text-xl"
+              variant={isLocked ? "default" : "neutral"}
+              onClick={() => setIsLocked(!isLocked)}
+            >
+              {isLocked ? <FaLock /> : <FaUnlock />}
+            </Button>
 
-          <Button
-            size="lg"
-            type="button"
-            className="h-12 text-base font-heading dark:text-text md:text-lg lg:h-14 lg:text-xl"
-            variant={isLocked ? "default" : "neutral"}
-            onClick={() => setIsLocked(!isLocked)}
-          >
-            {isLocked ? <FaLock /> : <FaUnlock />}
-          </Button>
+            <LinkOptionsDialog slug={slug} setSlug={setSlug} />
+
+            <LinkHistorySheet>
+              <Button
+                size="lg"
+                type="button"
+                className="h-12 w-full text-base font-heading dark:text-text md:text-lg lg:h-14 lg:text-xl"
+                variant="neutral"
+              >
+                <FaList />
+              </Button>
+            </LinkHistorySheet>
+          </div>
         </motion.div>
 
         <GeneratedLinkCard generatedLink={generatedLink} />

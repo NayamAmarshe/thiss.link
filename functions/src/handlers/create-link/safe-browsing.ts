@@ -1,10 +1,18 @@
+import { logger } from "firebase-functions/v1";
+
 export const dynamic = "force-dynamic";
 
 export const googleSafeBrowsingCheck = async (url: string) => {
+  logger.log("Checking URL:", url);
   try {
     const SAFE_BROWSING_API_KEY = process.env.SAFE_BROWSING_API_KEY;
+    logger.log(
+      "🚀 => googleSafeBrowsingCheck => SAFE_BROWSING_API_KEY:",
+      SAFE_BROWSING_API_KEY,
+    );
 
     if (!SAFE_BROWSING_API_KEY) {
+      console.log("API key not found.");
       throw new Error("API key not found.");
     }
     const response = await fetch(
@@ -35,13 +43,13 @@ export const googleSafeBrowsingCheck = async (url: string) => {
     );
 
     const data = await response.json();
-    console.info("Safe Browsing Check Response:", data);
+    logger.info("Safe Browsing Check Response:", data);
 
     if (data && data?.matches?.length > 0) {
       // Handle error cases where the URL might not be checked by Safe Browsing
       throw new Error("Malicious link entered!");
     }
-  } catch (error) {
-    throw new Error("Failed to check the URL.");
+  } catch (error: any) {
+    throw new Error(error.message);
   }
 };

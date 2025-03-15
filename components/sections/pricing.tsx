@@ -7,7 +7,7 @@ export default function Pricing() {
         <h2 className="mb-14 text-center text-2xl font-heading md:text-3xl lg:mb-20 lg:text-4xl">
           Pricing
         </h2>
-        <div className="w900:mx-auto w900:w-2/3 w900:grid-cols-1 w500:w-full grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
           <PricingPlan
             planName="Free"
             description="I'm so generous omg! 🤗"

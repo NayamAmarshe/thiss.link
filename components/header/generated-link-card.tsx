@@ -3,11 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
 import { popInAnimation } from "@/lib/motion";
-import Link from "next/link";
-import { toast } from "@/hooks/use-toast";
 import { LinkDocument } from "@/types/documents";
-import { ToastAction } from "../ui/toast";
 import { FaClipboard, FaLink, FaList } from "react-icons/fa";
+import { toast } from "sonner";
+import LinkHistorySheet from "../link-history-sheet";
 
 const GeneratedLinkCard = ({
   generatedLink,
@@ -26,40 +25,30 @@ const GeneratedLinkCard = ({
       <a href={generatedLink.link} target="_blank" className="w-full">
         <Button className="w-full font-bold" variant="neutral" type="button">
           <FaLink className="mr-2 h-4 w-4" />
-          <span className="max-w-48 truncate">
-            {generatedLink.link}qweqwke12ok321o3ko1kj3
-          </span>
+          <span className="max-w-48 truncate">{generatedLink.link}</span>
         </Button>
       </a>
-      <Link href={`/links`}>
+      <LinkHistorySheet>
         <Button
           size="sm"
           type="button"
           variant="neutral"
           onClick={() => {
             navigator.clipboard.writeText(generatedLink.link);
-            toast({
-              title: "Copied",
-              description: "Link copied to clipboard",
-              action: <ToastAction altText="Got it">Got it</ToastAction>,
-            });
+            toast.success("Link copied to clipboard");
           }}
         >
           <FaList className="mr-2" />
           My Links
         </Button>
-      </Link>
+      </LinkHistorySheet>
       <Button
         size="sm"
         type="button"
         variant="neutral"
         onClick={() => {
           navigator.clipboard.writeText(generatedLink.link);
-          toast({
-            title: "Copied",
-            description: "Link copied to clipboard",
-            action: <ToastAction altText="Got it">Got it</ToastAction>,
-          });
+          toast.success("Link copied to clipboard");
         }}
       >
         <FaClipboard className="mr-2" />

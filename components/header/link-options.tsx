@@ -1,3 +1,4 @@
+import useUser from "@/hooks/use-user";
 import { Button } from "@/components/ui/button";
 import { FaSave, FaWrench } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
@@ -26,10 +27,11 @@ import {
   LinkExpiry,
   linkExpiryAtom,
 } from "../../atoms/user-settings";
-import useUser from "../../hooks/use-user";
 import { useCallback, useEffect, useState } from "react";
-import { toast } from "@/hooks/use-toast";
-import { ToastAction } from "../ui/toast";
+import { StarIcon } from "lucide-react";
+import { toast } from "sonner";
+
+// Extend the Firebase User type
 
 const LinkOptionsDialog = ({
   slug,
@@ -41,8 +43,17 @@ const LinkOptionsDialog = ({
   const [linkExpiry, setLinkExpiry] = useAtom(linkExpiryAtom);
   const [downloadQrCode, setDownloadQrCode] = useAtom(downloadQrCodeAtom);
   const [error, setError] = useState<string | null>(null);
+  const { isLoggedIn, userDocument } = useUser();
 
-  const { isLoggedIn } = useUser();
+  const hasActiveSubscription = userDocument?.subscription?.status === "ACTIVE";
+
+  const canUseCustomLinks = (userDocument?.customLinksUsage?.count || 0) < 5;
+
+  useEffect(() => {
+    if (!canUseCustomLinks) {
+      setSlug("");
+    }
+  }, [canUseCustomLinks]);
 
   const checkSlug = useCallback(() => {
     console.log("Checking slug");
@@ -81,7 +92,7 @@ const LinkOptionsDialog = ({
           size="lg"
           type="button"
           variant="neutral"
-          className="h-12 text-base font-heading md:text-lg lg:h-14 lg:text-xl"
+          className="h-12 w-full text-base font-heading md:text-lg lg:h-14 lg:text-xl"
         >
           <FaWrench />
         </Button>
@@ -90,12 +101,20 @@ const LinkOptionsDialog = ({
         <DialogHeader>
           <DialogTitle>Link Options</DialogTitle>
           <DialogDescription>
-            {isLoggedIn ? (
-              "Make changes to your link here."
-            ) : (
-              <span className="font-semibold text-red-500">
-                Sign in to make changes to your link.
-              </span>
+            Customize your link with these options.
+            {!isLoggedIn && (
+              <div className="bg-muted mt-2 flex items-center gap-1 rounded-md bg-main p-2 text-sm">
+                <StarIcon className="h-4 w-4" />
+                Sign in to use custom links and link expiry features.
+              </div>
+            )}
+            {isLoggedIn && !hasActiveSubscription && (
+              <div className="bg-muted mt-2 flex items-center gap-1 text-balance rounded-md bg-main p-2 text-sm">
+                <StarIcon className="h-4 w-4" />
+                {canUseCustomLinks
+                  ? "Upgrade to set link expiry."
+                  : "Upgrade to use unlimited custom links and link expiry features."}
+              </div>
             )}
           </DialogDescription>
         </DialogHeader>
@@ -103,6 +122,7 @@ const LinkOptionsDialog = ({
           <div className="flex flex-col items-start gap-2">
             <Label htmlFor="name" className="text-right">
               Custom Link
+              {` (${userDocument?.customLinksUsage?.count ?? 0}/5 used)`}
             </Label>
             <div className="relative flex w-full items-center">
               <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-sm text-text text-opacity-50 dark:text-darkText">
@@ -112,12 +132,12 @@ const LinkOptionsDialog = ({
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
                 className="w-full pl-[118px] font-semibold"
-                disabled={!isLoggedIn}
+                disabled={!isLoggedIn || !canUseCustomLinks}
               />
             </div>
           </div>
 
-          <div className="flex flex-col items-start gap-2">
+          {/* <div className="flex flex-col items-start gap-2">
             <Label htmlFor="download-qr-code">Download QR Code</Label>
             <Switch
               id="download-qr-code"
@@ -125,7 +145,7 @@ const LinkOptionsDialog = ({
               disabled={!isLoggedIn}
               onCheckedChange={(checked) => setDownloadQrCode(checked)}
             />
-          </div>
+          </div> */}
 
           <div className="flex flex-col items-start gap-2">
             <Label htmlFor="download-qr-code">Link Expiration</Label>
@@ -134,6 +154,12 @@ const LinkOptionsDialog = ({
                 id="disable-link-expiry"
                 checked={!!linkExpiry}
                 onCheckedChange={(checked) => {
+                  if (!hasActiveSubscription && checked) {
+                    toast.error(
+                      "Link expiry is only available with a subscription",
+                    );
+                    return;
+                  }
                   setLinkExpiry(checked ? "24-hours" : undefined);
                 }}
                 disabled={!isLoggedIn}
@@ -141,7 +167,7 @@ const LinkOptionsDialog = ({
               <Select
                 onValueChange={(value) => setLinkExpiry(value as LinkExpiry)}
                 value={linkExpiry as string | undefined}
-                disabled={!linkExpiry || !isLoggedIn}
+                disabled={!linkExpiry || !isLoggedIn || !hasActiveSubscription}
               >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Never" />
@@ -163,11 +189,7 @@ const LinkOptionsDialog = ({
               onClick={(e) => {
                 checkSlug();
                 if (error) {
-                  toast({
-                    title: "Error",
-                    description: error,
-                    action: <ToastAction altText="Got it">Got it</ToastAction>,
-                  });
+                  toast.error(error);
                   e.preventDefault();
                 }
               }}

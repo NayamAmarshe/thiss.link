@@ -7,9 +7,8 @@ import { popInAnimation } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { LinkDocument } from "@/types/documents";
 import { decryptUrl } from "@/lib/decrypt-url";
-import { toast } from "@/hooks/use-toast";
-import { ToastAction } from "./ui/toast";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const UnlockForm = ({
   checkingLink,
@@ -32,17 +31,15 @@ const UnlockForm = ({
       if (decoded) {
         router.push(decoded);
       } else {
-        toast({
-          title: "Invalid password",
+        toast.error("Invalid password", {
           description: "The password you entered is incorrect.",
-          action: <ToastAction altText="Got it">Got it</ToastAction>,
+          action: <Button>Got it</Button>,
         });
       }
     } catch (error) {
-      toast({
-        title: "Invalid password",
+      toast.error("Invalid password", {
         description: "The password you entered is incorrect.",
-        action: <ToastAction altText="Got it">Got it</ToastAction>,
+        action: <Button>Got it</Button>,
       });
     }
 
