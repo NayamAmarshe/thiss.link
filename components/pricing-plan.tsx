@@ -1,9 +1,7 @@
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { usePayPalSubscription } from "@/hooks/usePayPalSubscription";
-import { PayPalButtons } from "@paypal/react-paypal-js";
 import useUser from "../hooks/use-user";
+import { PolarSubscribeButton } from "./polar-subscribe-button";
 
 export default function PricingPlan({
   perks,
@@ -11,22 +9,15 @@ export default function PricingPlan({
   planName,
   description,
   price,
-  planId,
+  productId,
 }: {
   perks: string[];
   mostPopular?: boolean;
   planName: string;
   description: string;
   price: string;
-  planId?: string;
+  productId?: string;
 }) {
-  const {
-    isLoading,
-    isReady,
-    subscriptionOnApproveHandler,
-    createSubscriptionHandler,
-  } = usePayPalSubscription(planId || "");
-
   const { isLoggedIn, userDocument, handleLogin, userLoading } = useUser();
 
   return (
@@ -55,7 +46,7 @@ export default function PricingPlan({
         </ul>
       </div>
       <div className="mt-8">
-        {isLoggedIn ? null : (
+        {!isLoggedIn ? (
           <Button
             onClick={handleLogin}
             className="w-full"
@@ -63,47 +54,9 @@ export default function PricingPlan({
           >
             Get Started
           </Button>
-        )}
-
-        {isLoggedIn &&
-          !userDocument?.subscription?.subscriptionId &&
-          planId && (
-            <div className={cn("w-full", { "opacity-50": isLoading })}>
-              {isReady && (
-                <PayPalButtons
-                  style={{ layout: "vertical" }}
-                  createSubscription={(_, actions) => {
-                    return actions.subscription.create({
-                      plan_id: planId,
-                    });
-                  }}
-                  onApprove={subscriptionOnApproveHandler}
-                />
-              )}
-            </div>
-          )}
-
-        {isLoggedIn && userDocument?.subscription?.subscriptionId && planId && (
-          <div className={cn("w-full", { "opacity-50": isLoading })}>
-            {isReady && (
-              <a
-                href={
-                  process.env.NODE_ENV === "development"
-                    ? "https://www.sandbox.paypal.com/myaccount/autopay/"
-                    : "https://www.paypal.com/myaccount/autopay/"
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full"
-                role="link"
-              >
-                <Button className="w-full" type="button">
-                  Manage Subscription
-                </Button>
-              </a>
-            )}
-          </div>
-        )}
+        ) : productId ? (
+          <PolarSubscribeButton productId={productId} className="w-full" />
+        ) : null}
       </div>
     </div>
   );

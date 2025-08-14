@@ -20,9 +20,9 @@ export default function Pricing() {
             ]}
           />
           <PricingPlan
-            planName="Premium"
+            planName="🗿 Sigma Tier"
             description="For Kings and Queens 👑"
-            price="10"
+            price="6.99"
             perks={[
               "Unlimited links",
               "Unlimited custom links",
@@ -32,7 +32,7 @@ export default function Pricing() {
               "Password protection",
               "Analytics (Coming Soon)",
             ]}
-            planId={process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID || ""}
+            productId="REPLACE_WITH_YOUR_POLAR_PRICE_ID"
           />
         </div>
       </div>

@@ -4,7 +4,7 @@
     "lint": "eslint --ext .js,.ts .",
     "build": "tsc",
     "build:watch": "tsc --watch --preserveWatchOutput",
-    "dev": "NODE_ENV=development npm run build:watch --preserve & firebase emulators:start --import=./data --export-on-exit",
+    "dev": "NODE_ENV=development (npm run build:watch --preserve & firebase emulators:start --import=./data --export-on-exit)",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
@@ -16,11 +16,12 @@
   },
   "main": "lib/index.js",
   "dependencies": {
+    "@polar-sh/sdk": "^0.15.0",
     "buffer-crc32": "^1.0.0",
     "crypto-js": "^4.2.0",
     "date-fns": "^4.1.0",
     "firebase-admin": "^12.7.0",
-    "firebase-functions": "^6.3.2",
+    "firebase-functions": "^6.4.0",
     "monkey-typewriter": "^1.0.14"
   },
   "devDependencies": {
@@ -30,7 +31,7 @@
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-import": "^2.25.4",
     "firebase-functions-test": "^3.1.0",
-    "typescript": "^4.9.0"
+    "typescript": "^5.6.3"
   },
   "private": true,
   "volta": {
