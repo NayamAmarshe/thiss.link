@@ -178,7 +178,7 @@ const LinkHistorySheet = ({ children }: LinkHistorySheetProps) => {
   return (
     <Sheet onOpenChange={setIsOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent className="overflow-y-auto">
+      <SheetContent className="bg-background overflow-y-auto">
         <SheetHeader>
           <SheetTitle>My Links</SheetTitle>
           <SheetDescription>
@@ -198,7 +198,7 @@ const LinkHistorySheet = ({ children }: LinkHistorySheetProps) => {
               {combinedLinks.map((link) => (
                 <div
                   key={link.slug}
-                  className="flex flex-col gap-2 rounded-base border-2 border-border bg-main p-4 shadow-light dark:border-dark-border dark:shadow-dark"
+                  className="rounded-base border-border bg-main shadow-light dark:border-dark-border dark:shadow-dark flex flex-col gap-2 border-2 p-4"
                 >
                   <div className="flex items-center justify-between">
                     <a href={link.link} target="_blank" className="w-full">
