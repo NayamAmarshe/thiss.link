@@ -16,7 +16,7 @@ import { functions } from "../lib/firebase/firebase";
 import {
   CreateLinkRequest,
   CreateLinkResponse,
-} from "../functions/src/handlers/create-link";
+} from "../functions/src/api/create-link";
 import { toast } from "sonner";
 import LinkHistorySheet from "./link-history-sheet";
 

@@ -131,7 +131,7 @@ const LinkOptionsDialog = ({
               <Input
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
-                className="w-full pl-[118px] font-semibold"
+                className="w-full pl-[111px] font-semibold"
                 disabled={!isLoggedIn || !canUseCustomLinks}
               />
             </div>

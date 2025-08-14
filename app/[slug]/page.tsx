@@ -12,7 +12,7 @@ import { functions } from "../../lib/firebase/firebase";
 import {
   GetLinkRequest,
   GetLinkResponse,
-} from "../../functions/src/handlers/get-link";
+} from "../../functions/src/api/get-link";
 import { toast } from "sonner";
 
 const SlugPage = ({ params }: { params: { slug: string } }) => {

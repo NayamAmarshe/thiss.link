@@ -27,9 +27,7 @@ export const createLink = onCall(
     timeoutSeconds: 60,
     region: ["us-central1"],
   },
-  async (req, res): Promise<CreateLinkResponse> => {
-    console.log("🚀 => req:", req);
-    console.log("🚀 => res:", res);
+  async (req): Promise<CreateLinkResponse> => {
     logger.info("createLink called!", { structuredData: true });
 
     try {

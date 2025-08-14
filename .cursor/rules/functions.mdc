@@ -1,0 +1,138 @@
+---
+globs: functions/**,functions/**/*
+alwaysApply: false
+---
+# Firebase Functions - thiss.link Cursor Rules
+
+## Project Overview
+This is a Firebase Functions backend for thiss.link, a link shortener. The functions handle user authentication, payment processing, link shortening tasks, and various API endpoints.
+
+## Code Style & Architecture
+
+### Function Structure
+- All Firebase function handlers follow the pattern: 
+	```typescript
+	export const apiEndpointName = onCall(
+		{
+			cors: true,
+			timeoutSeconds: 60,
+			region: ["us-central1"],
+		},
+		async (request): Promise<ApiEndpointNameResponse> => {}
+	```
+- Functions are organized in `/functions/src/api/` directory by feature area
+- Each handler should include comprehensive error handling and logging
+- Use structured logging with the custom logger utility
+
+### Authentication & Security
+- Always check for user authentication before processing private requests
+- Return standardized error responses with proper HTTP status codes
+- Validate all required fields in request body before processing
+- Use TypeScript interfaces for request/response types, stored in the same file as the API endpoint.
+
+### Database Operations
+- Use Firestore transactions for atomic operations when needed
+- Always check if documents exist before operating on them
+- Use the `timestamp()` utility for consistent timestamp handling
+- User documents are stored in `users/{userId}` collection
+
+### Error Handling
+- Use try-catch blocks for all async operations
+- Log errors with context using `logger.error()`
+- Return structured error responses with status codes:
+  ```typescript
+	throw new HttpsError("unauthenticated", "Request had invalid credentials.", {
+		"some-key": "some-value"
+	});
+  ```
+- Common error statuses: "ok", "cancelled", "unknown", "invalid-argument", "deadline-exceeded", "not-found", "already-exists", "permission-denied", "resource-exhausted", "failed-precondition", "aborted", "out-of-range", "unimplemented", "internal", "unavailable", "data-loss", "unauthenticated"
+
+### Logging
+- Use the custom logger from `lib/logger.ts` instead of console methods
+- Log function entry: `logger.info("functionName called")`
+- Log important operations and their outcomes
+- Include relevant context (userId, etc.) in logs
+- Use appropriate log levels: `info`, `warn`, `error`, `debug`
+
+### External API Integration
+- Use environment variables for API keys and sensitive data
+- Implement proper error handling for external API calls
+- Always validate API responses before processing
+
+### Type Safety
+- Use strict TypeScript types for all function parameters and return values
+- Import types from the appropriate type definition files
+- Define request/response interfaces in the same file as the API endpoint.
+- Use proper type assertions with runtime validation
+
+## Specific Patterns
+
+### User Management
+- Check user existence before operations: `userDoc.exists`
+- Update user documents with proper typing: `userRef.update(updateData)`
+
+### Payment Integration
+- Support 'Polar.sh' payment provider. Always check the polar.sh docs.
+- Use webhooks for payment status updates
+- Maintain payment history and subscription status in user documents
+- Handle subscription lifecycle events properly
+
+## Environment & Configuration
+- Use environment variables for all configuration
+- Configure proper CORS settings
+- Use Firebase Admin SDK for server-side operations
+
+## Development
+- Validate input/output with actual data structures
+
+## Common Utilities
+- `timestamp()` - Convert various date formats to Firestore Timestamp
+- `logger` - Structured logging with environment-aware output
+
+## Response Patterns
+Always return consistent response structures:
+
+### Success Response
+```typescript
+return {
+  status: "success",
+	message: "" // message
+  data: {
+    // response data
+  },
+};
+```
+
+### Error Response
+```typescript
+	throw new HttpsError("unauthenticated", "Request had invalid credentials.", {
+		"some-key": "some-value"
+	});
+```
+
+## Security Best Practices
+- Validate all user inputs
+- Use parameterized queries for database operations
+- Implement proper rate limiting where needed
+- Sanitize data before external API calls
+- Never expose sensitive information in error messages
+
+## Performance Considerations
+- Use Firestore transactions sparingly and only when needed
+- Implement proper pagination for large data sets
+- Cache frequently accessed data when appropriate
+- Use batch operations for multiple database writes
+- Monitor function execution time and memory usage
+
+## Code Organization
+- Keep functions focused and single-purpose
+- Extract common logic into lib functions
+- Use descriptive function and variable names
+- Group related functionality in subdirectories
+- Maintain consistent file naming conventions
+
+## Documentation
+- Add JSDoc comments for public functions
+- Document complex business logic inline
+- Keep type definitions up to date
+- Document environment variable requirements

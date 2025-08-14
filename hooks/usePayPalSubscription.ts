@@ -11,7 +11,7 @@ import {
 import {
   VerifySubscriptionRequest,
   VerifySubscriptionResponse,
-} from "@/functions/src/handlers/verify-subscription";
+} from "@/functions/src/api/verify-subscription";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "@/lib/firebase/firebase";
 import { toast } from "sonner";

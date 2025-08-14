@@ -6,10 +6,11 @@ export const googleSafeBrowsingCheck = async (url: string) => {
   logger.log("Checking URL:", url);
   try {
     const SAFE_BROWSING_API_KEY = process.env.SAFE_BROWSING_API_KEY;
-    logger.log(
-      "🚀 => googleSafeBrowsingCheck => SAFE_BROWSING_API_KEY:",
-      SAFE_BROWSING_API_KEY,
-    );
+    const ENABLE_SAFE_BROWSING = process.env.ENABLE_SAFE_BROWSING;
+
+    if (!ENABLE_SAFE_BROWSING) {
+      return;
+    }
 
     if (!SAFE_BROWSING_API_KEY) {
       console.log("API key not found.");
