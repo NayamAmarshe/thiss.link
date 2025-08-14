@@ -21,12 +21,12 @@ export default function PricingPlan({
   const { isLoggedIn, userDocument, handleLogin, userLoading } = useUser();
 
   return (
-    <div className="flex flex-col justify-between rounded-base border-2 border-border bg-white p-5 dark:border-darkBorder dark:bg-secondaryBlack">
+    <div className="flex flex-col justify-between rounded-base border-2 border-border bg-white p-5 dark:border-dark-border dark:bg-secondary-black">
       <div>
         <div className="flex items-center justify-between">
           <h3 className="text-2xl font-heading">{planName}</h3>
           {mostPopular && (
-            <span className="rounded-base border-2 border-border bg-main px-2 py-0.5 text-sm text-text dark:border-darkBorder">
+            <span className="rounded-base border-2 border-border bg-main px-2 py-0.5 text-sm text-text dark:border-dark-border">
               Most popular
             </span>
           )}
@@ -39,7 +39,7 @@ export default function PricingPlan({
         <ul className="mt-8 flex flex-col gap-2">
           {perks.map((perk) => (
             <li key={perk} className="flex items-center gap-2">
-              <Check className="h-5 w-5 text-mainAccent" strokeWidth={5} />
+              <Check className="h-5 w-5 text-main-accent" strokeWidth={5} />
               <span>{perk}</span>
             </li>
           ))}

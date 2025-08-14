@@ -2,9 +2,9 @@
 
 import { Provider } from "jotai";
 import { ThemeProvider } from "next-themes";
-import { Toaster } from "@/components/ui/toaster";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
+import { Toaster } from "./ui/sonner";
 
 // import { connectFirestoreEmulator } from "firebase/firestore";
 // import { auth, db } from "@/lib/firebase/firebase";

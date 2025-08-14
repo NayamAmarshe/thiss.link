@@ -73,7 +73,7 @@ const UnlockForm = ({
           >
             <Input
               type="password"
-              className="h-12 text-base font-heading md:text-lg lg:h-14 lg:text-xl"
+              className="font-heading h-12 text-base md:text-lg lg:h-14 lg:text-xl"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter password here..."
@@ -86,9 +86,9 @@ const UnlockForm = ({
           <Button
             type="submit"
             className={cn(
-              "h-12 w-full text-base font-heading md:text-lg lg:h-14 lg:text-xl",
+              "font-heading h-12 w-full text-base md:text-lg lg:h-14 lg:text-xl",
               checkingLink &&
-                "pointer-events-none translate-x-boxShadowX translate-y-boxShadowY shadow-none dark:shadow-none",
+                "translate-x-box-shadow-x translate-y-box-shadow-y pointer-events-none shadow-none dark:shadow-none",
             )}
             size="lg"
             disabled={checkingLink}

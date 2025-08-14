@@ -198,7 +198,7 @@ const LinkHistorySheet = ({ children }: LinkHistorySheetProps) => {
               {combinedLinks.map((link) => (
                 <div
                   key={link.slug}
-                  className="flex flex-col gap-2 rounded-base border-2 border-border bg-main p-4 shadow-light dark:border-darkBorder dark:shadow-dark"
+                  className="flex flex-col gap-2 rounded-base border-2 border-border bg-main p-4 shadow-light dark:border-dark-border dark:shadow-dark"
                 >
                   <div className="flex items-center justify-between">
                     <a href={link.link} target="_blank" className="w-full">

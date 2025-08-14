@@ -29,8 +29,8 @@ export default function Features() {
   ];
 
   return (
-    <div className="snap-start snap-always">
-      <section className="border-t-border bg-bg font-base dark:border-t-darkBorder dark:bg-darkBg border-t-2 py-20 md:px-20 lg:py-[100px]">
+    <div className="bg-background snap-start snap-always">
+      <section className="border-t-border bg-bg font-base dark:border-t-dark-border dark:bg-dark-bg border-t-2 py-20 md:px-20 lg:py-[100px]">
         <h2 className="font-heading mb-14 px-5 text-center text-2xl md:text-3xl lg:mb-20 lg:text-4xl">
           Features? Yeah I&apos;ll show you features!
         </h2>
@@ -39,7 +39,7 @@ export default function Features() {
           {features.map((feature, i) => {
             return (
               <div
-                className="rounded-base border-border shadow-light dark:border-darkBorder dark:bg-secondaryBlack dark:shadow-dark flex flex-col gap-3 border-2 bg-white p-5"
+                className="rounded-base border-border shadow-shadow dark:border-dark-border dark:bg-secondary-black dark:shadow-dark flex flex-col gap-3 border-2 bg-white p-5"
                 key={i}
               >
                 <h4 className="font-heading text-xl">{feature.title}</h4>
@@ -51,7 +51,7 @@ export default function Features() {
       </section>
       <div>
         <Marquee
-          className="border-y-border font-base dark:border-darkBorder dark:border-y-darkBorder dark:bg-secondaryBlack border-y-2 bg-white py-3 sm:py-5"
+          className="border-y-border font-base dark:border-dark-border dark:border-y-dark-border dark:bg-secondary-black border-y-2 bg-white py-3 sm:py-5"
           direction="left"
         >
           {Array(10)

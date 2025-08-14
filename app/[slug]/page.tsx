@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, use } from "react";
 import Head from "next/head";
 import Navbar from "@/components/navbar";
 import Header from "@/components/sections/header";
@@ -15,7 +15,8 @@ import {
 } from "../../functions/src/api/get-link";
 import { toast } from "sonner";
 
-const SlugPage = ({ params }: { params: { slug: string } }) => {
+const SlugPage = (props: { params: Promise<{ slug: string }> }) => {
+  const params = use(props.params);
   const router = useRouter();
 
   const [linkData, setLinkData] = useState<LinkDocument | null>(null);

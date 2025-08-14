@@ -125,7 +125,7 @@ const LinkOptionsDialog = ({
               {` (${userDocument?.customLinksUsage?.count ?? 0}/5 used)`}
             </Label>
             <div className="relative flex w-full items-center">
-              <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-sm text-text text-opacity-50 dark:text-darkText">
+              <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-sm text-text text-opacity-50 dark:text-dark-text">
                 https://thiss.link/
               </span>
               <Input

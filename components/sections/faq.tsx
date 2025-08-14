@@ -8,9 +8,9 @@ import Marquee from "react-fast-marquee";
 
 export default function Faq() {
   return (
-    <div className="snap-start snap-always">
-      <section className="bg-bg py-20 font-base dark:bg-darkBg lg:py-[100px]">
-        <h2 className="mb-14 px-5 text-center text-2xl font-heading md:text-3xl lg:mb-20 lg:text-4xl">
+    <div className="bg-background snap-start snap-always">
+      <section className="bg-bg font-base dark:bg-dark-bg py-20 lg:py-[100px]">
+        <h2 className="font-heading mb-14 px-5 text-center text-2xl md:text-3xl lg:mb-20 lg:text-4xl">
           Frequently asked questions
         </h2>
 
@@ -47,7 +47,7 @@ export default function Faq() {
       </section>
       <div>
         <Marquee
-          className="border-y-2 border-y-border bg-white py-3 font-base dark:border-darkBorder dark:border-y-darkBorder dark:bg-secondaryBlack sm:py-5"
+          className="border-y-border font-base dark:border-dark-border dark:border-y-dark-border dark:bg-secondary-black border-y-2 bg-white py-3 sm:py-5"
           direction="right"
         >
           {Array(10)
@@ -55,7 +55,7 @@ export default function Faq() {
             .map((x, id) => {
               return (
                 <div className="flex items-center" key={id}>
-                  <span className="mx-8 text-xl font-heading sm:text-2xl lg:text-4xl">
+                  <span className="font-heading mx-8 text-xl sm:text-2xl lg:text-4xl">
                     thiss.link
                   </span>
                 </div>

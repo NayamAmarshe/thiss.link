@@ -2,7 +2,7 @@ import { KeyboardIcon, MouseIcon } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="z-30 flex flex-col items-center justify-between gap-2 border-t-2 border-t-border bg-white px-5 py-5 text-center text-sm font-base sm:flex-row">
+    <footer className="border-t-border bg-background font-base z-30 flex flex-col items-center justify-between gap-2 border-t-2 px-5 py-5 text-center text-sm sm:flex-row">
       <div className="flex items-end gap-4">
         <h4 className="text-xl font-bold">thiss.link</h4>
         <div className="my-auto flex items-center gap-2">

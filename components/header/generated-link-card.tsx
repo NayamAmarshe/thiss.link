@@ -17,7 +17,7 @@ const GeneratedLinkCard = ({
 
   return (
     <motion.div
-      className="flex items-center justify-between gap-2 rounded-base border-2 border-border bg-main p-4 text-black shadow-light dark:border-darkBorder dark:shadow-dark"
+      className="flex items-center justify-between gap-2 rounded-base border-2 border-border bg-main p-4 text-black shadow-light dark:border-dark-border dark:shadow-dark"
       variants={popInAnimation}
       initial="hidden"
       animate="visible"

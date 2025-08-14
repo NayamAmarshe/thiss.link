@@ -21,7 +21,7 @@ export default function Header({
       initial="hidden"
       animate="visible"
       className={cn(
-        "flex h-screen w-full snap-start snap-always flex-col items-center justify-center gap-4 bg-white bg-[linear-gradient(to_right,#80808033_1px,transparent_1px),linear-gradient(to_bottom,#80808033_1px,transparent_1px)] bg-[size:70px_70px] dark:bg-secondaryBlack",
+        "flex h-screen w-full snap-start snap-always flex-col items-center justify-center gap-4 !bg-white bg-[linear-gradient(to_right,#80808033_1px,transparent_1px),linear-gradient(to_bottom,#80808033_1px,transparent_1px)] bg-size-[70px_70px]",
       )}
     >
       {/* Content */}
@@ -37,15 +37,15 @@ export default function Header({
               src="/logo.svg"
               alt="logo"
               className={cn(
-                "mx-auto w-full max-w-[300px] transition-transform duration-500 ease-in-out dark:opacity-95 dark:invert sm:max-w-[400px]",
+                "mx-auto w-full max-w-[300px] transition-transform duration-500 ease-in-out sm:max-w-[400px] dark:opacity-95 dark:invert",
                 creatingLink && "scale-95",
               )}
             />
           </motion.div>
-          <motion.span className="inline-block -rotate-1 bg-mainAccent px-2">
+          <motion.span className="bg-main inline-block -rotate-1 px-2">
             <motion.p
               className={cn(
-                "rotate-1 text-lg font-bold leading-relaxed transition-opacity duration-500 dark:text-mainAccent sm:text-xl lg:text-2xl lg:leading-relaxed",
+                "dark:text-main-accent rotate-1 text-lg leading-relaxed font-bold transition-opacity duration-500 sm:text-xl lg:text-2xl lg:leading-relaxed",
               )}
             >
               Free and Open Source Link Shortener

@@ -75,7 +75,7 @@ export default function SuccessPage() {
   if (pageState === "loading") {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="bg-card text-card-foreground w-full max-w-md rounded-lg border shadow-sm">
+        <div className="bg-card text-card-foreground w-full max-w-md rounded-lg border shadow-xs">
           <div className="flex flex-col items-center space-y-4 p-6">
             <Loader2 className="text-primary h-8 w-8 animate-spin" />
             <div className="space-y-2 text-center">
@@ -92,7 +92,7 @@ export default function SuccessPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
-      <div className="bg-card text-card-foreground w-full max-w-md rounded-lg border shadow-sm">
+      <div className="bg-card text-card-foreground w-full max-w-md rounded-lg border shadow-xs">
         <div className="p-8">
           <div className="space-y-6 text-center">
             {pageState === "success" ? (

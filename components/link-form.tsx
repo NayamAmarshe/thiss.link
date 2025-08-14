@@ -97,7 +97,7 @@ const LinkForm = ({
       >
         <motion.div className="z-10 w-full" variants={popInAnimation}>
           <Input
-            className="h-12 w-full text-base font-heading md:text-lg lg:h-14 lg:text-xl"
+            className="font-heading h-12 w-full text-base md:text-lg lg:h-14 lg:text-xl"
             type="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
@@ -127,7 +127,7 @@ const LinkForm = ({
             >
               <Input
                 type="password"
-                className="h-12 w-full text-base font-heading md:text-lg lg:h-14 lg:text-xl"
+                className="font-heading h-12 w-full text-base md:text-lg lg:h-14 lg:text-xl"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password here..."
@@ -144,9 +144,9 @@ const LinkForm = ({
           <Button
             type="submit"
             className={cn(
-              "h-12 w-full text-base font-heading md:text-lg lg:h-14 lg:text-xl",
+              "font-heading h-12 w-full text-base md:text-lg lg:h-14 lg:text-xl",
               creatingLink &&
-                "pointer-events-none translate-x-boxShadowX translate-y-boxShadowY shadow-none dark:shadow-none",
+                "translate-x-box-shadow-x translate-y-box-shadow-y pointer-events-none shadow-none dark:shadow-none",
             )}
             size="lg"
             disabled={creatingLink}
@@ -159,7 +159,7 @@ const LinkForm = ({
             <Button
               size="lg"
               type="button"
-              className="h-12 w-full text-base font-heading dark:text-text md:text-lg lg:h-14 lg:text-xl"
+              className="font-heading dark:text-text h-12 w-full text-base md:text-lg lg:h-14 lg:text-xl"
               variant={isLocked ? "default" : "neutral"}
               onClick={() => setIsLocked(!isLocked)}
             >
@@ -172,7 +172,7 @@ const LinkForm = ({
               <Button
                 size="lg"
                 type="button"
-                className="h-12 w-full text-base font-heading dark:text-text md:text-lg lg:h-14 lg:text-xl"
+                className="font-heading dark:text-text h-12 w-full text-base md:text-lg lg:h-14 lg:text-xl"
                 variant="neutral"
               >
                 <FaList />
