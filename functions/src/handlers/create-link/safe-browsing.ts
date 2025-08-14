@@ -4,6 +4,14 @@ export const dynamic = "force-dynamic";
 
 export const googleSafeBrowsingCheck = async (url: string) => {
   logger.log("Checking URL:", url);
+  
+  // Check if safe browsing should be skipped
+  const SKIP_SAFE_BROWSING = process.env.SKIP_SAFE_BROWSING;
+  if (SKIP_SAFE_BROWSING === "true") {
+    logger.log("🚀 => googleSafeBrowsingCheck => SKIP_SAFE_BROWSING is true, skipping safe browsing check");
+    return;
+  }
+  
   try {
     const SAFE_BROWSING_API_KEY = process.env.SAFE_BROWSING_API_KEY;
     logger.log(
