@@ -1,6 +1,7 @@
 import { onCall } from "firebase-functions/https";
 import { logger } from "../../lib/logger";
 import { Polar } from "@polar-sh/sdk";
+import * as admin from "firebase-admin";
 
 export type CreatePolarCheckoutRequest = {
   userId: string;
@@ -48,6 +49,10 @@ export const createPolarCheckout = onCall(
         return { status: "error", message: "Missing userId" };
       }
 
+      // Fetch the user email from the database
+      const user = await admin.auth().getUser(userId);
+      const email = user.email;
+
       const polar = new Polar({
         accessToken: token,
         server:
@@ -59,8 +64,15 @@ export const createPolarCheckout = onCall(
         productId,
         nodeEnv: process.env.NODE_ENV,
       });
-      // Create a checkout session for the provided product and tag userId for reconciliation
-      const checkout = await polar.checkouts.create({});
+      // Create a checkout session for the provided product
+      const checkout = await polar.checkouts.create({
+        products: [productId], // This should be a valid Product UUID from Polar
+        successUrl: successUrl,
+        metadata: {
+          userId,
+          email: email || "",
+        },
+      });
 
       if (!checkout || !checkout.url) {
         logger.error("Polar checkout did not return a URL", { checkout });

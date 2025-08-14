@@ -32,7 +32,7 @@ export default function Pricing() {
               "Password protection",
               "Analytics (Coming Soon)",
             ]}
-            productId="REPLACE_WITH_YOUR_POLAR_PRICE_ID"
+            productId="812a8355-ef1f-4e82-81c3-d418f28090bc"
           />
         </div>
       </div>
