@@ -42,8 +42,8 @@ export const createPolarCheckout = onCall(
       const successUrl =
         body.successUrl ||
         (process.env.NODE_ENV === "development"
-          ? "http://localhost:3000/?checkout=success"
-          : "https://thiss.link/?checkout=success");
+          ? "http://localhost:3000/success?checkout_id={CHECKOUT_ID}"
+          : "https://thiss.link/success?checkout_id={CHECKOUT_ID}");
 
       if (!userId) {
         return { status: "error", message: "Missing userId" };
@@ -66,8 +66,12 @@ export const createPolarCheckout = onCall(
       });
       // Create a checkout session for the provided product
       const checkout = await polar.checkouts.create({
-        products: [productId], // This should be a valid Product UUID from Polar
+        products: [productId],
         successUrl: successUrl,
+        externalCustomerId: userId,
+        customerEmail: email?.includes("example.com")
+          ? email.split("@")[0] + "@testtest.com"
+          : email,
         metadata: {
           userId,
           email: email || "",
