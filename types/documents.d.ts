@@ -12,11 +12,11 @@ export type UserDocument = {
   subscription?: {
     planDuration?: "monthly" | "yearly";
     subscriptionId: string;
-    status: "ACTIVE" | "INACTIVE" | "CREATED";
+    status: "active" | "canceled" | "revoked";
     startPaymentTime: Timestamp | null;
     lastPaymentTime: Timestamp | null;
     nextPaymentTime: Timestamp | null;
-    planId: string;
+    productId: string;
   };
   customLinksUsage?: {
     count: number;

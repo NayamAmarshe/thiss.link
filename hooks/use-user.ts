@@ -10,8 +10,6 @@ import {
 } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { UserDocument } from "@/types/documents";
-import { functions } from "@/lib/firebase/firebase";
-import { httpsCallable } from "firebase/functions";
 
 /**
  * Custom hook for managing user data and tasks.
@@ -28,24 +26,8 @@ const useUser = () => {
     setUserLoading(true);
     try {
       const provider = new GoogleAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
-      const createUserFunction = httpsCallable(functions, "createUser");
-
-      try {
-        const result = await createUserFunction({
-          user: userCredential.user,
-        });
-
-        const responseData = result.data as { status: string; message: string };
-        if (responseData.status === "error") {
-          throw new Error(responseData.message);
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          throw new Error("Failed to create user: " + error.message);
-        }
-        throw new Error("Failed to create user");
-      }
+      await signInWithPopup(auth, provider);
+      // User document will be created automatically by the Firebase Auth trigger
     } catch (error) {
       console.error("Error signing in:", error);
     } finally {

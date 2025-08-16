@@ -41,8 +41,7 @@ export function PolarSubscribeButton({ productId, className }: Props) {
         toast.error("Failed to start checkout. Please try again.");
         return;
       }
-      // Redirect in a new tab
-      window.open(data.url, "_blank");
+      window.location.href = data.url;
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong. Please try again.");
