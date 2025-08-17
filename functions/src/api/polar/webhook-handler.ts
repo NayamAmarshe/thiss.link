@@ -6,6 +6,8 @@ import {
   validateEvent,
   WebhookVerificationError,
 } from "@polar-sh/sdk/webhooks";
+import type { Order } from "@polar-sh/sdk/models/components/order.js";
+import type { Subscription } from "@polar-sh/sdk/models/components/subscription.js";
 
 const WEBHOOK_SECRET = process.env.POLAR_WEBHOOK_SECRET || "";
 
@@ -26,13 +28,20 @@ export const polarWebhookHandler = async (
     const eventType = event.type || "";
     const now = new Date();
 
+    const eventData =
+      eventType === "order.created"
+        ? (event.data as Order)
+        : eventType.includes("subscription.")
+          ? (event.data as Subscription)
+          : event.data;
+
     logger.info("Polar webhook:", {
       eventType,
       dataKeys: Object.keys(event.data || {}),
     });
 
     // Attempt to resolve user id from event payload
-    const userId: string | undefined = (event.data as any)?.metadata?.userId;
+    const userId: string | undefined = (eventData as any)?.metadata?.userId;
 
     if (!userId) {
       logger.warn("Polar webhook without resolvable userId", { eventType });
@@ -46,8 +55,10 @@ export const polarWebhookHandler = async (
       return response.sendStatus(200);
     }
 
-    const subscriptionId: string | undefined = (event.data as any)?.subscription
-      ?.id;
+    const subscriptionId: string | undefined =
+      (event.data as Order)?.subscriptionId ||
+      (event.data as Subscription)?.id ||
+      undefined;
     const productId: string | undefined = (event.data as any)?.product.id;
     const startPaymentTime: string = (event.data as any)?.currentPeriodStart;
     const lastPaymentTime: string = (event.data as any)?.currentPeriodEnd;
@@ -85,7 +96,10 @@ export const polarWebhookHandler = async (
         await userRef.update({
           isSubscribed: false,
           subscription: existing.subscription
-            ? { ...existing.subscription, status: "INACTIVE" }
+            ? {
+                ...existing.subscription,
+                status: eventType.includes("canceled") ? "canceled" : "revoked",
+              }
             : undefined,
           updatedAt: Timestamp.fromDate(now),
         } as Partial<UserDocument>);
