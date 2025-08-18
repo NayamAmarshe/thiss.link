@@ -7,8 +7,6 @@ const regex = /^(?:(http)s?|ftp|magnet):(?:\/\/[^\s/$.?#].[^\s]*|[^\s]*)$/;
 
 const slugRegex = /^[a-z0-9](-?[a-z0-9])*$/;
 
-const MAX_REDIRECTS = 1; // Maximum allowed redirects
-
 const maliciousDomains = [
   ".eu.org",
   "nakula.fun",
@@ -16,48 +14,6 @@ const maliciousDomains = [
   "datingflirt.click",
   "wahyucakep.org",
 ];
-
-// Helper function to check JavaScript-based or meta redirects in page content
-function checkForJSRedirect(content) {
-  // Regex patterns to detect JavaScript and meta tag redirects
-  const jsRedirectRegex =
-    /(?:window\.location\.(?:href|assign|replace)\s*=\s*['"]([^'"]+)['"]|window\.opener\s*=\s*null;\s*location\.(?:replace|href|assign)\(['"]([^'"]+)['"]\))/;
-  const metaRedirectRegex =
-    /<meta[^>]+http-equiv=["']refresh["'][^>]+url=([^'"]+)/i;
-
-  // Check for JavaScript-based redirects
-  const jsMatch = content.match(jsRedirectRegex);
-  const metaMatch = content.match(metaRedirectRegex);
-
-  // Return the URL if found in any match
-  return jsMatch?.[1] || jsMatch?.[2] || metaMatch?.[1] || null;
-}
-
-async function fetchWithRedirects(url, maxRedirects) {
-  let currentUrl = url;
-  let redirectCount = 0;
-
-  while (redirectCount < maxRedirects) {
-    const response = await fetch(currentUrl, {
-      redirect: "manual", // Do not follow redirects
-    });
-
-    const pageContent = await response.text();
-    const jsRedirect = checkForJSRedirect(pageContent);
-
-    if (jsRedirect) {
-      currentUrl = jsRedirect;
-      redirectCount++;
-      console.log(`JS Redirect ${redirectCount} to: ${currentUrl}`);
-    } else {
-      // No further redirects, return the final response
-      return { response, redirectCount, currentUrl };
-    }
-  }
-
-  // Return the final response after redirect threshold or no more redirects
-  return { response: await fetch(currentUrl), redirectCount };
-}
 
 // Function to verify Turnstile token
 async function verifyTurnstileToken(token) {
@@ -155,28 +111,9 @@ export default async function handler(req, res) {
   }
 
   if (URI[1]) {
-    // Redirection check
-    try {
-      // Step 1: Check for HTTP redirects using fetch
-      const { redirectCount, currentUrl } = await fetchWithRedirects(
-        link,
-        MAX_REDIRECTS,
-      );
-
-      if (maliciousDomains.some((domain) => currentUrl.includes(domain))) {
-        return res.status(401).json({ message: "Malicious link entered!" });
-      }
-      if (redirectCount >= MAX_REDIRECTS) {
-        console.log("🚀 => redirectCount:", redirectCount);
-        return res.status(400).json({
-          message: `Suspcious URL detected. If this is a valid URL, please report this issue.`,
-        });
-      }
-    } catch (error) {
-      console.error("Error checking link:", error);
-      return res.status(500).json({
-        message: "Error checking the link.",
-      });
+    // Basic malicious domain check
+    if (maliciousDomains.some((domain) => link.includes(domain))) {
+      return res.status(401).json({ message: "Malicious link entered!" });
     }
 
     if (process.env.SKIP_SAFE_BROWSING === "true") {
