@@ -18,6 +18,7 @@ import Form from "../components/home/Form";
 import { useEffect } from "react";
 import { useState } from "react";
 import Background from "../components/Background";
+import { useTurnstile } from "react-turnstile";
 
 export default function Home() {
   // !GLOBAL
@@ -36,10 +37,11 @@ export default function Home() {
   const [password, setPassword] = useState("");
   const [locked, setLocked] = useState(false);
   const [customSlug, setCustomSlug] = useState("");
+  const [captchaToken, setCaptchaToken] = useState(null);
   const slugRegex = /^[a-z0-9](-?[a-z0-9])*$/;
+  const turnstile = useTurnstile();
 
-  const linkRegex =
-    /^(https?|ftp|magnet):(?:\/\/[^\s/$.?#].[^\s]*|[^\s]*)$/;
+  const linkRegex = /^(https?|ftp|magnet):(?:\/\/[^\s/$.?#].[^\s]*|[^\s]*)$/;
 
   useEffect(() => {
     const linksInStorage = JSON.parse(localStorage.getItem("links")) || [];
@@ -92,6 +94,11 @@ export default function Home() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!captchaToken) {
+      toast.warn("Please complete the captcha verification");
+      return;
+    }
+
     if (locked && password === "") {
       toast.warn("Please enter a password to unlock the link");
       return;
@@ -140,6 +147,7 @@ export default function Home() {
         slug: customOrDefaultSlug,
         password: locked ? password : "",
         link: magnetLink,
+        captchaToken: captchaToken,
       }),
     })
       .then((response) => {
@@ -201,6 +209,7 @@ export default function Home() {
           pauseOnHover: true,
         });
       });
+    turnstile.reset();
   };
 
   return (
@@ -242,6 +251,9 @@ export default function Home() {
             magnetLink={magnetLink}
             setMagnetLink={setMagnetLink}
             setLinkSettingsOpen={setLinkSettingsOpen}
+            captchaToken={captchaToken}
+            setCaptchaToken={setCaptchaToken}
+            turnstile={turnstile}
           />
         </div>
         <LinkClipboard

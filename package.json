@@ -26,7 +26,8 @@
     "react-icons": "^5.0.1",
     "react-spinners": "^0.13.8",
     "react-swipeable": "^7.0.1",
-    "react-toastify": "^10.0.4"
+    "react-toastify": "^10.0.4",
+    "react-turnstile": "^1.1.4"
   },
   "devDependencies": {
     "@types/react": "18.3.3",

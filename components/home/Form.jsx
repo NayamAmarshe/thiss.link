@@ -6,6 +6,7 @@ import {
   BsFillLockFill,
   BsFillUnlockFill,
 } from "react-icons/bs";
+import TurnstileWidget from "../TurnstileWidget";
 
 const Form = ({
   locked,
@@ -16,8 +17,28 @@ const Form = ({
   setMagnetLink,
   handleSubmit,
   setLinkSettingsOpen,
+  captchaToken,
+  setCaptchaToken,
+  turnstile,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleCaptchaVerify = (token) => {
+    console.log("🚀 => handleCaptchaVerify => token:", token);
+    setCaptchaToken(token);
+  };
+
+  const handleCaptchaError = (error) => {
+    setCaptchaToken(null);
+    console.error("Captcha verification failed", error);
+    turnstile.reset();
+  };
+
+  const handleCaptchaExpire = () => {
+    setCaptchaToken(null);
+    console.warn("Captcha expired");
+    turnstile.reset();
+  };
   return (
     <form
       onSubmit={handleSubmit}
@@ -97,10 +118,26 @@ const Form = ({
             />
           )}
         </div>
+
+        {/* TURNSTILE CAPTCHA */}
+        <div className="w-full max-w-80">
+          <TurnstileWidget
+            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+            onVerify={handleCaptchaVerify}
+            onError={handleCaptchaError}
+            onExpire={handleCaptchaExpire}
+            theme="auto"
+          />
+        </div>
       </div>
 
       {/* LIGHT IT UP BUTTON */}
-      <input type="submit" className="submit-button" value="Light It Up 🔥" />
+      <input
+        type="submit"
+        className={`submit-button ${!captchaToken ? "cursor-not-allowed opacity-50" : ""}`}
+        value="Light It Up 🔥"
+        disabled={!captchaToken}
+      />
     </form>
   );
 };

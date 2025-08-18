@@ -59,16 +59,57 @@ async function fetchWithRedirects(url, maxRedirects) {
   return { response: await fetch(currentUrl), redirectCount };
 }
 
+// Function to verify Turnstile token
+async function verifyTurnstileToken(token) {
+  const secretKey = process.env.TURNSTILE_SECRET_KEY;
+  if (!secretKey) {
+    throw new Error("Turnstile secret key not configured");
+  }
+
+  const response = await fetch(
+    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        secret: secretKey,
+        response: token,
+      }),
+    },
+  );
+
+  const result = await response.json();
+  return result.success;
+}
+
 export default async function handler(req, res) {
-  const { slug, link, password } = req.body;
+  const { slug, link, password, captchaToken } = req.body;
   console.log("🚀 => body:", req.body);
 
-  const apiKey = process.env.SAFE_BROWSING_API_KEY;
+  // Verify captcha token first
+  if (!captchaToken) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      message: "Captcha verification required",
+    });
+  }
 
-  return res.status(StatusCodes.BAD_REQUEST).json({
-    message:
-      "Due to constant abuse by scammers and phishers, MagLit has decided to stop accepting new links. We are working on a new version of MagLit that will be more secure and user-friendly. We apologize for the inconvenience.",
-  });
+  try {
+    const captchaValid = await verifyTurnstileToken(captchaToken);
+    if (!captchaValid) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "Captcha verification failed. Please try again.",
+      });
+    }
+  } catch (error) {
+    console.error("Captcha verification error:", error);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Captcha verification service unavailable",
+    });
+  }
+
+  const apiKey = process.env.SAFE_BROWSING_API_KEY;
 
   if (!apiKey) {
     return res
