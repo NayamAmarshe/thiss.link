@@ -22,6 +22,14 @@ const Layout = ({ children }) => {
         </div>
       ) : (
         <div className="animate relative overflow-hidden bg-slate-50 dark:bg-stone-900">
+          {/* SITE NOTICE */}
+          <div className="relative z-50 w-full bg-gradient-to-r from-orange-500 to-amber-500 px-4 py-3 text-center text-sm font-medium text-white shadow-lg">
+            <p>
+              🎉 Link creation has been enabled again. It was disabled due to
+              abuse by scammers and spammers. MagLit will soon be replaced with
+              a new version. Stay tuned!
+            </p>
+          </div>
           <Navbar />
           {/* LINKS CARDS */}
           <ScrollingCards />
