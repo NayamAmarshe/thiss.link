@@ -13,6 +13,9 @@ const maliciousDomains = [
   "ixg.llc",
   "datingflirt.click",
   "wahyucakep.org",
+  "wixsite.com",
+  "wix.com",
+  "wix.site",
 ];
 
 // Function to verify Turnstile token
