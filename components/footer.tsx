@@ -13,13 +13,13 @@ export default function Footer() {
           >
             Github
           </a>
-          <a
+          {/* <a
             target="_blank"
             href="https://www.buymeacoffee.com/fossisthefuture"
             className="font-heading underline"
           >
             Buy Me A Coffee
-          </a>
+          </a> */}
         </div>
       </div>
       <p className="text-sm">
