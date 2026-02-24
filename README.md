@@ -75,10 +75,12 @@ You can start editing the page by modifying `pages/index.js`. The page auto-upda
 
 The `pages/api` directory is mapped to `/api/*`. Read more about [API routes](https://nextjs.org/docs/api-routes/introduction).
 
+<!--
 ## If you like the project
 
 <a href="https://www.buymeacoffee.com/fossisthefuture">
 <img alt="bmc-button" src="https://user-images.githubusercontent.com/25067102/154570688-9e143f2b-fee3-4b05-a9d2-a7a3013b2b51.png" />
 </a>
+-->
 
 ### 🔥 https://maglit.me 🔥
